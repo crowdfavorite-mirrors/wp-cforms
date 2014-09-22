@@ -1,4 +1,5 @@
 <?php
+
 ###
 ### please see cforms.php for more information
 ###
@@ -99,17 +100,6 @@ if( isset($_REQUEST['cforms_rsskeysnew']) ) {
 	update_option('cforms_settings',$cformsSettings);
 }
 
-### Reset Admin and AutoConf messages
-if( isset($_REQUEST['cforms_resetAdminMsg']) ) {
-	$cformsSettings['form'.$no]['cforms'.$no.'_header'] = __('A new submission (form: "{Form Name}")', 'cforms') . "\r\n============================================\r\n" . __('Submitted on: {Date}', 'cforms') . "\r\n" . __('Via: {Page}', 'cforms') . "\r\n" . __('By {IP} (visitor IP)', 'cforms') . ".\r\n" . ".\r\n";
-	$cformsSettings['form'.$no]['cforms'.$no.'_header_html'] = '<p '.$cformsSettings['global']['cforms_style']['meta'].'>' . __('A form has been submitted on {Date}, via: {Page} [IP {IP}]', 'cforms') . '</p>';
-	update_option('cforms_settings',$cformsSettings);
-}
-if( isset($_REQUEST['cforms_resetAutoCMsg']) ) {
-	$cformsSettings['form'.$no]['cforms'.$no.'_cmsg'] = __('Dear {Your Name},', 'cforms') . "\n" . __('Thank you for your note!', 'cforms') . "\n". __('We will get back to you as soon as possible.', 'cforms') . "\n\n";
-	$cformsSettings['form'.$no]['cforms'.$no.'_cmsg_html'] = '<div '.$cformsSettings['global']['cforms_style']['autoconf'].'><p '.$cformsSettings['global']['cforms_style']['dear'] .'>'. __('Dear {Your Name},', 'cforms') . "</p>\n<p ". $cformsSettings['global']['cforms_style']['confp'].'>'. __('Thank you for your note!', 'cforms') . "</p>\n<p ".$cformsSettings['global']['cforms_style']['confp'].'>'. __('We will get back to you as soon as possible.', 'cforms') . "\n<div ".$cformsSettings['global']['cforms_style']['confirmationmsg'].'>'.__('This is an automatic confirmation message.', 'cforms')." {Date}.</div></div>\n\n";
-	update_option('cforms_settings',$cformsSettings);
-}
 
 ### delete field if we find one and move the rest up
 $deletefound = 0;
@@ -173,21 +163,7 @@ if( strlen($fd)<=2 ) {
 ### check for abspath.php
 abspath_check();
 
-$userconfirm = $cformsSettings['global']['cforms_confirmerr'];
-if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
-	if ( isset($_GET['cf_confirm']) && $_GET['cf_confirm']=='confirm64' ){
-		$cformsSettings['global']['cforms_confirmerr'] = $userconfirm|64;
-		update_option('cforms_settings',$cformsSettings);
-	} else {
-		$text = '<p><strong><u>'.__('Please note the main changes for v13.0','cforms').'</u></strong></p>'.
-				'<p>'.__('<strong>Admin Action Menu & Saving Settings</strong><br/>Note that the floating admin drop down on the right side has been moved into the admin bar at the top!', 'cforms').'</p>'.
-				'<p>'.__('<strong>Date Picker</strong><br/>going forward, cforms will exclusively utilize WP\'s jQuery date picker version! See global settings for supported date formats.', 'cforms').'</p>'.
-				'<p>'.__('<strong>Admin and Auto Confirmation Messages</strong><br/>The email layouts have been revised and improved, please goto your individual Message Settings and <u>reset to default</u>.', 'cforms').'</p>';
-		echo '<div id="message64" class="updated fade">'.$text.'<p><a href="?page='.$plugindir.'/cforms-options.php&cf_confirm=confirm64" class="rm_button allbuttons">'.__('Remove Message','cforms').'</a></p></div>';
-	}
-}
 ?>
-
 <div class="wrap" id="top">
 	<div id="icon-cforms-settings" class="icon32"><br/></div><h2><?php _e('Form Settings','cforms')?></h2>
 
@@ -195,7 +171,7 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
 		<table class="chgformbox" title="<?php _e('Navigate to your other forms.', 'cforms') ?>">
 		<tr>
             <td class="chgL">
-            	<label for="switchform" class="bignumber navbar"><?php _e('Navigate to', 'cforms') ?> </label>
+            	<label for="switchform" class="bignumber"><?php _e('Navigate to', 'cforms') ?> </label>
                 <?php echo $formlistbox; ?><input type="submit" class="allbuttons go" id="go" name="go" value="<?php _e('Go', 'cforms');?>"/>
             </td>
             <td class="chgM">
@@ -229,23 +205,23 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
 
 	<fieldset id="anchorfields" class="cf-content">
 
-		<div>
+		<p>
 			<?php echo sprintf(__('Please see the <strong>Help!</strong> section for information on how to deploy the various <a href="%s" %s>supported fields</a>,', 'cforms'),'?page='.$plugindir.'/cforms-help.php#fields','onclick="setshow(19)"') . ' ' .
 					   sprintf(__('set up forms using <a href="%s" %s>FIELDSETS</a>,', 'cforms'), '?page='.$plugindir.'/cforms-help.php#hfieldsets','onclick="setshow(19)"') .
 					   sprintf(__('use <a href="%s" %s>default values</a> &amp; <a href="%s" %s>regular expressions</a> for single &amp; multi-line fields. ', 'cforms'),'?page='.$plugindir.'/cforms-help.php#single','onclick="setshow(19)"','?page='.$plugindir.'/cforms-help.php#regexp','onclick="setshow(19)"') .
 					   sprintf(__('Besides the generic success &amp; failure messages below, you can add <a href="%s" %s>custom error messages</a>.', 'cforms'),'?page='.$plugindir.'/cforms-help.php#customerr','onclick="setshow(20)"'); ?>
-		</div>
+		</p>
 
 		<div class="tableheader">
         	<div id="cformswarning" style="display:none"><?php echo __('Please save the new order of fields (<em>Update Settings</em>)!','cforms'); ?></div>
         	<div>
 	            <div class="fh1" title="<?php _e('Can be a simple label or a more complex expression. See Help!', 'cforms'); ?>"><br /><span class="abbr"><?php _e('Field Name', 'cforms'); ?></span></div>
 	            <div class="fh2" title="<?php _e('Pick one of the supported input field types.', 'cforms'); ?>"><br /><span class="abbr"><?php _e('Type', 'cforms'); ?></span></div>
-	            <div><img src="<?php echo $cforms_root; ?>/images/ic_required.png" title="<?php _e('Makes an input field required for proper form validation.', 'cforms'); ?>" alt="" /><br /><?php _e('required', 'cforms'); ?></div>
-	            <div><img src="<?php echo $cforms_root; ?>/images/ic_email.png" title="<?php _e('Makes the field required and verifies the email address.', 'cforms'); ?>" alt="" /><br /><?php _e('e-mail', 'cforms'); ?></div>
-	            <div><img src="<?php echo $cforms_root; ?>/images/ic_clear.png" title="<?php _e('Clears the field (default value) upon focus.', 'cforms'); ?>" alt="" /><br /><?php _e('auto-clear', 'cforms'); ?></div>
-	            <div><img src="<?php echo $cforms_root; ?>/images/ic_disabled.png" title="<?php _e('Grey\'s out a form field (field will be completely disabled).', 'cforms'); ?>" alt="" /><br /><?php _e('disabled', 'cforms'); ?></div>
-	            <div><img src="<?php echo $cforms_root; ?>/images/ic_readonly.png" title="<?php _e('Form field will be readonly!', 'cforms'); ?>" alt="" /><br /><?php _e('read-only', 'cforms'); ?></div>
+	            <div><img src="<?php echo $cforms_root; ?>/images/ic_required.gif" title="<?php _e('Makes an input field required for proper form validation.', 'cforms'); ?>" alt="" /><br /><?php _e('required', 'cforms'); ?></div>
+	            <div><img src="<?php echo $cforms_root; ?>/images/ic_email.gif" title="<?php _e('Makes the field required and verifies the email address.', 'cforms'); ?>" alt="" /><br /><?php _e('e-mail', 'cforms'); ?></div>
+	            <div><img src="<?php echo $cforms_root; ?>/images/ic_clear.gif" title="<?php _e('Clears the field (default value) upon focus.', 'cforms'); ?>" alt="" /><br /><?php _e('auto-clear', 'cforms'); ?></div>
+	            <div><img src="<?php echo $cforms_root; ?>/images/ic_disabled.gif" title="<?php _e('Grey\'s out a form field (field will be completely disabled).', 'cforms'); ?>" alt="" /><br /><?php _e('disabled', 'cforms'); ?></div>
+	            <div><img src="<?php echo $cforms_root; ?>/images/ic_readonly.gif" title="<?php _e('Form field will be readonly!', 'cforms'); ?>" alt="" /><br /><?php _e('read-only', 'cforms'); ?></div>
        		</div>
 		</div>
 
@@ -323,71 +299,49 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
 
 	                            <input tabindex="<?php echo $ti++ ?>" title="<?php _e('Please enter field definition', 'cforms'); ?>" class="inpfld" <?php echo $specialclass; ?> name="field_<?php echo($i); ?>_name" id="field_<?php echo($i); ?>_name" size="30" value="<?php echo ($field_type == 'fieldsetend')?'--':$field_name; ?>" /><span title="<?php echo $cforms_root.'/js/include/'; ?>"><input value="" type="submit" onfocus="this.blur()" class="wrench jqModal" title="<?php _e('Edit', 'cforms'); ?>"/></span><select tabindex="<?php echo $ti++ ?>" title="<?php _e('Pick a field type', 'cforms'); ?>" class="fieldtype selfld" <?php echo $specialclass; ?> name="field_<?php echo($i); ?>_type" id="field_<?php echo($i); ?>_type">
 
-								<optgroup label="<?php _e('----- General form fields ----', 'cforms'); ?>">
-									<option value="fieldsetstart" <?php echo($field_type == 'fieldsetstart'?' selected="selected"':''); ?>><?php _e('Begin Fieldset', 'cforms'); ?></option>
-									<option value="fieldsetend" <?php echo($field_type == 'fieldsetend'?' selected="selected"':''); ?>><?php _e('End Fieldset', 'cforms'); ?></option>
-									<option value="textonly" <?php echo($field_type == 'textonly'?' selected="selected"':''); ?>><?php _e('Text only (no input)', 'cforms'); ?></option>
-									<option value="textfield" <?php echo($field_type == 'textfield'?' selected="selected"':''); ?>><?php _e('Single line of text', 'cforms'); ?></option>
-									<option value="textarea" <?php echo($field_type == 'textarea'?' selected="selected"':''); ?>><?php _e('Multiple lines of text', 'cforms'); ?></option>
-									<option value="checkbox" <?php echo($field_type == 'checkbox'?' selected="selected"':''); ?>><?php _e('Check Box', 'cforms'); ?></option>
-									<option value="checkboxgroup" <?php echo($field_type == 'checkboxgroup'?' selected="selected"':''); ?>><?php _e('Check Box Group', 'cforms'); ?></option>
-									<option value="radiobuttons" <?php echo($field_type == 'radiobuttons'?' selected="selected"':''); ?>><?php _e('Radio Buttons', 'cforms'); ?></option>
-									<option value="selectbox" <?php echo($field_type == 'selectbox'?' selected="selected"':''); ?>><?php _e('Select Box', 'cforms'); ?></option>
-									<option value="multiselectbox" <?php echo($field_type == 'multiselectbox'?' selected="selected"':''); ?>><?php _e('Multi Select Box', 'cforms'); ?></option>
-									<option value="upload" <?php echo($field_type == 'upload'?' selected="selected"':''); ?>><?php _e('File Upload Box', 'cforms'); ?></option>
-                                
-									<option<?php if ( $cformsSettings['global']['cforms_datepicker']<>'1' ) echo ' disabled="disabled" class="disabled"'; ?> value="datepicker" <?php echo($field_type == 'datepicker'?' selected="selected"':''); ?>><?php _e('Date Entry/Dialog', 'cforms'); ?></option>
-									<option value="pwfield" <?php echo($field_type == 'pwfield'?' selected="selected"':''); ?>><?php _e('Password Field', 'cforms'); ?></option>
-									<option value="hidden" <?php echo($field_type == 'hidden'?' selected="selected"':''); ?>><?php _e('Hidden Field', 'cforms'); ?></option>
-								</optgroup>
+                                <option value="fieldsetstart" <?php echo($field_type == 'fieldsetstart'?' selected="selected"':''); ?>><?php _e('New Fieldset', 'cforms'); ?></option>
+                                <option value="textonly" <?php echo($field_type == 'textonly'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Text only (no input)', 'cforms'); ?></option>
+                                <option value="textfield" <?php echo($field_type == 'textfield'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Single line of text', 'cforms'); ?></option>
+                                <option value="textarea" <?php echo($field_type == 'textarea'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Multiple lines of text', 'cforms'); ?></option>
+                                <option value="checkbox" <?php echo($field_type == 'checkbox'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Check Box', 'cforms'); ?></option>
+                                <option value="checkboxgroup" <?php echo($field_type == 'checkboxgroup'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Check Box Group', 'cforms'); ?></option>
+                                <option value="radiobuttons" <?php echo($field_type == 'radiobuttons'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Radio Buttons', 'cforms'); ?></option>
+                                <option value="selectbox" <?php echo($field_type == 'selectbox'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Select Box', 'cforms'); ?></option>
+                                <option value="multiselectbox" <?php echo($field_type == 'multiselectbox'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Multi Select Box', 'cforms'); ?></option>
+                                <option value="upload" <?php echo($field_type == 'upload'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('File Upload Box', 'cforms'); ?></option>
+                                <option<?php if ( $cformsSettings['global']['cforms_datepicker']<>'1' ) echo ' disabled="disabled" class="disabled"'; ?> value="datepicker" <?php echo($field_type == 'datepicker'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Date Entry/Dialog', 'cforms'); ?></option>
+                                <option value="pwfield" <?php echo($field_type == 'pwfield'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Password Field', 'cforms'); ?></option>
+                                <option value="hidden" <?php echo($field_type == 'hidden'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Hidden Field', 'cforms'); ?></option>
+                                <option value="fieldsetend" <?php echo($field_type == 'fieldsetend'?' selected="selected"':''); ?>><?php _e('End Fieldset', 'cforms'); ?></option>
 
-								<optgroup label="<?php _e('--------- Special ------------', 'cforms'); ?>">
-									<option<?php if ( $ccboxused && $field_type<>"ccbox" ) echo ' disabled="disabled" class="disabled"'; ?> value="ccbox" <?php echo($field_type == 'ccbox'?' selected="selected"':''); ?>><?php _e('CC: option for user', 'cforms'); ?></option>
-									<option<?php if ( $emailtoboxused && $field_type<>"emailtobox" ) echo ' disabled="disabled" class="disabled"'; ?>  value="emailtobox" <?php echo($field_type == 'emailtobox'?' selected="selected"':''); ?>><?php _e('Multiple Recipients', 'cforms'); ?></option>
-									<option<?php if ( $verificationused && $field_type<>"verification" ) echo ' disabled="disabled" class="disabled"'; ?>  value="verification" <?php echo($field_type == 'verification'?' selected="selected"':''); ?>><?php _e('Visitor verification (Q&amp;A)', 'cforms'); ?></option>
-									<option<?php if ( $captchaused && $field_type<>"captcha" ) echo ' disabled="disabled" class="disabled"'; ?>  value="captcha" <?php echo($field_type == 'captcha'?' selected="selected"':''); ?>><?php _e('Captcha verification (image)', 'cforms'); ?></option>
-									<?php if ( class_exists('sg_subscribe') ) : ?>
-										<option<?php echo $dis; ?> value="subscribe" <?php echo($field_type == 'subscribe'?' selected="selected"':''); ?>><?php _e('Subscribe To Comments', 'cforms'); ?></option>
-									<?php endif; ?>
-									<?php if ( function_exists('commentluv_setup') ) : ?>
-										<option<?php echo $dis; ?> value="luv" <?php echo($field_type == 'luv'?' selected="selected"':''); ?>><?php _e('Comment Luv', 'cforms'); ?></option>
-									<?php endif; ?>
-								</optgroup>
+                                <option value="" class="disabled" disabled="disabled">                   <?php _e('--------- Special ------------', 'cforms'); ?></option>
+                                <option<?php if ( $ccboxused && $field_type<>"ccbox" ) echo ' disabled="disabled" class="disabled"'; ?> value="ccbox" <?php echo($field_type == 'ccbox'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('CC: option for user', 'cforms'); ?></option>
+                                <option<?php if ( $emailtoboxused && $field_type<>"emailtobox" ) echo ' disabled="disabled" class="disabled"'; ?>  value="emailtobox" <?php echo($field_type == 'emailtobox'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Multiple Recipients', 'cforms'); ?></option>
+                                <option<?php if ( $verificationused && $field_type<>"verification" ) echo ' disabled="disabled" class="disabled"'; ?>  value="verification" <?php echo($field_type == 'verification'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Visitor verification (Q&amp;A)', 'cforms'); ?></option>
+                                <option<?php if ( $captchaused && $field_type<>"captcha" ) echo ' disabled="disabled" class="disabled"'; ?>  value="captcha" <?php echo($field_type == 'captcha'?' selected="selected"':''); ?>>&nbsp;&nbsp;<?php _e('Captcha verification (image)', 'cforms'); ?></option>
 
                                 <?php if ( $isTAF<>1 ) $dis=' disabled="disabled" class="disabled"'; else $dis=''; ?>
-								<optgroup label="<?php _e('----- T-A-F form fields ------', 'cforms'); ?>">
-									<option<?php echo $dis; ?> value="yourname" <?php echo($field_type == 'yourname'?' selected="selected"':''); ?>><?php _e('T-A-F * Your Name', 'cforms'); ?></option>
-									<option<?php echo $dis; ?> value="youremail" <?php echo($field_type == 'youremail'?' selected="selected"':''); ?>><?php _e('T-A-F * Your Email', 'cforms'); ?></option>
-									<option<?php echo $dis; ?> value="friendsname" <?php echo($field_type == 'friendsname'?' selected="selected"':''); ?>><?php _e('T-A-F * Friend\'s Name', 'cforms'); ?></option>
-									<option<?php echo $dis; ?> value="friendsemail" <?php echo($field_type == 'friendsemail'?' selected="selected"':''); ?>><?php _e('T-A-F * Friend\'s Email', 'cforms'); ?></option>
-								</optgroup>
+                                <option value="" class="disabled" disabled="disabled"><?php _e('----- T-A-F form fields ------', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="yourname" <?php echo($field_type == 'yourname'?' selected="selected"':''); ?>><?php _e('T-A-F * Your Name', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="youremail" <?php echo($field_type == 'youremail'?' selected="selected"':''); ?>><?php _e('T-A-F * Your Email', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="friendsname" <?php echo($field_type == 'friendsname'?' selected="selected"':''); ?>><?php _e('T-A-F * Friend\'s Name', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="friendsemail" <?php echo($field_type == 'friendsemail'?' selected="selected"':''); ?>><?php _e('T-A-F * Friend\'s Email', 'cforms'); ?></option>
 
                                 <?php if ( $isTAF<>'2' ) $dis=' disabled="disabled" class="disabled"'; else $dis=''; ?>
-								<optgroup label="<?php _e('--- WP comment form fields ---', 'cforms'); ?>">
-									<option<?php echo $dis; ?> value="cauthor" <?php echo($field_type == 'cauthor'?' selected="selected"':''); ?>><?php _e('Comment Author', 'cforms'); ?></option>
-									<option<?php echo $dis; ?> value="email" <?php echo($field_type == 'email'?' selected="selected"':''); ?>><?php _e('Author\'s Email', 'cforms'); ?></option>
-									<option<?php echo $dis; ?> value="url" <?php echo($field_type == 'url'?' selected="selected"':''); ?>><?php _e('Author\'s URL', 'cforms'); ?></option>
-									<option<?php echo $dis; ?> value="comment" <?php echo($field_type == 'comment'?' selected="selected"':''); ?>><?php _e('Author\'s Comment', 'cforms'); ?></option>
-									<option<?php echo $dis; ?> value="send2author" <?php echo($field_type == 'send2author'?' selected="selected"':''); ?>><?php _e('Select: Email/Comment', 'cforms'); ?></option>
-								</optgroup>
+                                <option value="" class="disabled" disabled="disabled"><?php _e('--- WP comment form fields ---', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="cauthor" <?php echo($field_type == 'cauthor'?' selected="selected"':''); ?>><?php _e('Comment Author', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="email" <?php echo($field_type == 'email'?' selected="selected"':''); ?>><?php _e('Author\'s Email', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="url" <?php echo($field_type == 'url'?' selected="selected"':''); ?>><?php _e('Author\'s URL', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="comment" <?php echo($field_type == 'comment'?' selected="selected"':''); ?>><?php _e('Author\'s Comment', 'cforms'); ?></option>
+                                <option<?php echo $dis; ?> value="send2author" <?php echo($field_type == 'send2author'?' selected="selected"':''); ?>><?php _e('Select: Email/Comment', 'cforms'); ?></option>
 
-                                <?php if ( $cformsSettings['global']['cforms_html5'] ) : ?>
-								<optgroup label="<?php _e('--- HTML5 form fields ---', 'cforms'); ?>">
-									<option value="html5color" <?php echo($field_type == 'html5color'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Color Field', 'cforms'); ?></option>
-									<option value="html5date" <?php echo($field_type == 'html5date'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Date Field', 'cforms'); ?></option>
-									<option value="html5datetime" <?php echo($field_type == 'html5datetime'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Date/Time Field', 'cforms'); ?></option>
-									<option value="html5datetime-local" <?php echo($field_type == 'html5datetime-local'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Date/Time (local) Field', 'cforms'); ?></option>
-									<option value="html5email" <?php echo($field_type == 'html5email'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Email Field', 'cforms'); ?></option>
-									<option value="html5month" <?php echo($field_type == 'html5month'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Month Field', 'cforms'); ?></option>
-									<option value="html5number" <?php echo($field_type == 'html5number'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Number Field', 'cforms'); ?></option>
-									<option value="html5range" <?php echo($field_type == 'html5range'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Range Field', 'cforms'); ?></option>
-									<option value="html5search" <?php echo($field_type == 'html5search'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Search Field', 'cforms'); ?></option>
-									<option value="html5tel" <?php echo($field_type == 'html5tel'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Telephone Number Field', 'cforms'); ?></option>
-									<option value="html5time" <?php echo($field_type == 'html5time'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Time Field', 'cforms'); ?></option>
-									<option value="html5url" <?php echo($field_type == 'html5url'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('URL Field', 'cforms'); ?></option>
-									<option value="html5week" <?php echo($field_type == 'html5week'?' selected="selected"':''); ?>>html5&nbsp;<?php _e('Week Field', 'cforms'); ?></option>
-								</optgroup>
+                                <?php if ( class_exists('sg_subscribe') ) : ?>
+                                    <option<?php echo $dis; ?> value="subscribe" <?php echo($field_type == 'subscribe'?' selected="selected"':''); ?>><?php _e('Subscribe To Comments', 'cforms'); ?></option>
                                 <?php endif; ?>
+                                <?php if ( function_exists('commentluv_setup') ) : ?>
+                                    <option<?php echo $dis; ?> value="luv" <?php echo($field_type == 'luv'?' selected="selected"':''); ?>><?php _e('Comment Luv', 'cforms'); ?></option>
+                                <?php endif; ?>
+
                             	</select><?php
 
                             echo '<input tabindex="'.($ti++).'" '.(($field_count<=1)?'disabled="disabled"':'').' class="'.(($field_count<=1)?'noxbutton':'xbutton').'" type="submit" name="DeleteField'.$i.'" value="" title="'.__('Remove input field', 'cforms').'" alt="'.__('Remove input field', 'cforms').'" onfocus="this.blur()"/>';
@@ -398,25 +352,25 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
                                 echo '<input tabindex="'.($ti++).'" class="allchk fieldisreq chkfld" type="checkbox" title="'.__('input required', 'cforms').'" name="field_'.($i).'_required" value="required"'.($field_required == '1'?' checked="checked"':'').'/>';
 
 
-                            if( ! in_array($field_type,array('html5email','textfield','youremail','friendsemail','email')) )
+                            if( ! in_array($field_type,array('textfield','youremail','friendsemail','email')) )
                                 echo '<img class="chkno" src="'.$cforms_root.'/images/chkbox_grey.gif" alt="'.__('n/a', 'cforms').'" title="'.__('Not available.', 'cforms').'"/>';
                             else
                                 echo '<input tabindex="'.($ti++).'" class="allchk fieldisemail chkfld" type="checkbox" title="'.__('email required', 'cforms').'" name="field_'.($i).'_emailcheck" value="required"'.($field_emailcheck == '1'?' checked="checked"':'').'/>';
 
 
-                            if( ! ((strpos($field_type, 'tml5')!==false) || in_array($field_type,array('pwfield','textarea','textfield','datepicker','yourname','youremail','friendsname','friendsemail','email','author','url','comment'))) )
+                            if( ! in_array($field_type,array('pwfield','textarea','textfield','datepicker','yourname','youremail','friendsname','friendsemail','email','author','url','comment')) )
                                 echo '<img class="chkno" src="'.$cforms_root.'/images/chkbox_grey.gif" alt="'.__('n/a', 'cforms').'" title="'.__('Not available.', 'cforms').'"/>';
                             else
                                 echo '<input tabindex="'.($ti++).'" class="allchk fieldclear chkfld" type="checkbox" title="'.__('clear field', 'cforms').'" name="field_'.($i).'_clear" value="required"'.($field_clear == '1'?' checked="checked"':'').'/>';
 
 
-                            if( ! ((strpos($field_type, 'tml5')!==false) || in_array($field_type,array('pwfield','textarea','textfield','datepicker','checkbox','checkboxgroup','selectbox','multiselectbox','radiobuttons','upload'))) )
+                            if( ! in_array($field_type,array('pwfield','textarea','textfield','datepicker','checkbox','checkboxgroup','selectbox','multiselectbox','radiobuttons','upload')) )
                                 echo '<img class="chkno" src="'.$cforms_root.'/images/chkbox_grey.gif" alt="'.__('n/a', 'cforms').'" title="'.__('Not available.', 'cforms').'"/>';
                             else
                                 echo '<input tabindex="'.($ti++).'" class="allchk fielddisabled chkfld" type="checkbox" title="'.__('disabled', 'cforms').'" name="field_'.($i).'_disabled" value="required"'.($field_disabled == '1'?' checked="checked"':'').'/>';
 
 
-                            if( ! ((strpos($field_type, 'tml5')!==false) || in_array($field_type,array('pwfield','textarea','textfield','datepicker','checkbox','checkboxgroup','selectbox','multiselectbox','radiobuttons','upload'))) )
+                            if( ! in_array($field_type,array('pwfield','textarea','textfield','datepicker','checkbox','checkboxgroup','selectbox','multiselectbox','radiobuttons','upload')) )
                                 echo '<img class="chkno" src="'.$cforms_root.'/images/chkbox_grey.gif" alt="'.__('n/a', 'cforms').'" title="'.__('Not available.', 'cforms').'"/>';
                             else
                                 echo '<input tabindex="'.($ti++).'" class="allchk fieldreadonly chkfld" type="checkbox" title="'.__('read-only', 'cforms').'" name="field_'.($i).'_readonly" value="required"'.($field_readonly == '1'?' checked="checked"':'').'/>';
@@ -605,7 +559,7 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
 				<tr class="ob space10">
 					<td class="obL"></td>
 					<td class="obR">
-						<input class="allchk" type="checkbox" id="cforms_dontclear" name="cforms_dontclear" <?php if($cformsSettings['form'.$no]['cforms'.$no.'_mp']['mp_form']) echo 'disabled="disabled"'; if($cformsSettings['form'.$no]['cforms'.$no.'_dontclear']) echo "checked=\"checked\""; ?>/><label for="cforms_dontclear"><?php echo sprintf(__('%sDo not reset%s input fields after submission', 'cforms'),'<strong>','</strong>'); ?></label>
+						<input class="allchk" type="checkbox" id="cforms_dontclear" name="cforms_dontclear" <?php if($cformsSettings['form'.$no]['cforms'.$no.'_dontclear']) echo "checked=\"checked\""; ?>/><label for="cforms_dontclear"><?php echo sprintf(__('%sDo not reset%s input fields after submission', 'cforms'),'<strong>','</strong>'); ?></label>
 		 			</td>
 	  			</tr>
 
@@ -764,7 +718,7 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
 				</tr>
 				<tr class="ob">
 					<td class="obL"></td>
-					<td class="obR"><?php _e('The complete RSS URL &raquo;', 'cforms'); echo '<br />'.get_cf_siteurl().'?cformsRSS='.$no.urlencode('$#$').$cformsSettings['form'.$no]['cforms'.$no.'_rsskey']; ?></td>
+					<td class="obR"><?php _e('The complete RSS URL &raquo;', 'cforms'); echo '<br />'.get_option('siteurl').'?cformsRSS='.$no.urlencode('$#$').$cformsSettings['form'.$no]['cforms'.$no.'_rsskey']; ?></td>
 				</tr>
 				<?php endif; ?>
 				</table>
@@ -785,13 +739,6 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
                 <tr class="ob space15">
                     <td class="obL"></td>
                     <td class="obR"><input class="allchk" type="checkbox" id="cforms_emailoff" name="cforms_emailoff" <?php if($cformsSettings['form'.$no]['cforms'.$no.'_emailoff']=='1') echo "checked=\"checked\""; ?>/><label for="cforms_emailoff"><?php echo sprintf(__('%sTurn off%s admin email', 'cforms'),'<strong>','</strong>') ?></label></td>
-                </tr>
-				</table>
-
-				<table class="form-table">
-                <tr class="">
-                    <td class="obL"></td>
-                    <td class="obR"><input class="allchk" type="checkbox" id="cforms_emptyoff" name="cforms_emptyoff" <?php if($cformsSettings['form'.$no]['cforms'.$no.'_emptyoff']=='1') echo "checked=\"checked\""; ?>/><label for="cforms_emptyoff"><?php echo sprintf(__('%sExclude empty fields%s from admin email', 'cforms'),'<strong>','</strong>') ?></label></td>
                 </tr>
 				</table>
 
@@ -826,17 +773,8 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
                     </td>
                 </tr>
 
-				<tr class="ob space20">
-					<td class="obL" style="padding-bottom:0">&nbsp;</td>				
-					<td class="obR" style="padding-bottom:0">
-						<input type="submit" class="allbuttons" name="cforms_resetAdminMsg" id="cforms_resetAdminMsg" value="<?php _e('Reset admin message to default', 'cforms') ?>" onclick="javascript:document.mainform.action='#emailoptions';" />
-		 			</td>
-				</tr>
-				
-				<tr class="ob">
-					<td class="obL" style="padding-bottom:0">
-						<label for="cforms_header"><?php _e('<strong>Admin TEXT message</strong><br />(Header)', 'cforms') ?></label>
-					</td>
+				<tr class="ob space15">
+					<td class="obL" style="padding-bottom:0"><label for="cforms_header"><?php _e('<strong>Admin TEXT message</strong><br />(Header)', 'cforms') ?></label></td>
 					<td class="obR" style="padding-bottom:0">
                     	<table><tr>
 						<td><textarea class="resizable" rows="80px" cols="200px" name="cforms_header" id="cforms_header" ><?php echo stripslashes(htmlspecialchars($cformsSettings['form'.$no]['cforms'.$no.'_header'])); ?></textarea></td>
@@ -913,19 +851,12 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
 						<a class="infobutton" href="#" name="it8"><?php _e('Please read note &raquo;', 'cforms'); ?></a>
 		 			</td>
 				</tr>
-				
 				<tr id="it8" class="infotxt"><td>&nbsp;</td><td class="ex"><?php _e('For the <em>auto confirmation</em> feature to work, make sure to mark at least one field <code>Email</code>, otherwise <strong>NO</strong> auto confirmation email will be sent out! If multiple fields are checked "Email", only the first in the list will receive a notification.', 'cforms') ?></td></tr>
 
                 <?php if( $o=="1" ) :?>
 				<tr class="ob">
 					<td class="obL"><label for="cforms_csubject"><strong><?php _e('Subject auto confirmation', 'cforms') ?></strong></label></td>
 					<td class="obR"><input type="text" name="cforms_csubject" id="cforms_csubject" value="<?php $t=explode('$#$',$cformsSettings['form'.$no]['cforms'.$no.'_csubject']); echo stripslashes(htmlspecialchars($t[0])); ?>" /> <?php echo sprintf(__('<a href="%s" %s>Variables</a> allowed.', 'cforms'),'?page='. $plugindir.'/cforms-help.php#variables','onclick="setshow(23)"'); ?></td>
-				</tr>
-				<tr class="ob space20">
-					<td class="obL" style="padding-bottom:0">&nbsp;</td>				
-					<td class="obR" style="padding-bottom:0">
-						<input type="submit" class="allbuttons" name="cforms_resetAutoCMsg" id="cforms_resetAutoCMsg" value="<?php _e('Reset auto confirmation message to default', 'cforms') ?>" onclick="javascript:document.mainform.action='#autoconf';"/>
-		 			</td>
 				</tr>
 				<tr class="ob">
 					<td class="obL"><label for="cforms_cmsg"><strong><?php _e('TEXT message', 'cforms') ?></strong></label></td>
@@ -1140,13 +1071,21 @@ if ( ($userconfirm & 64) == 0 ){	### 64 = upgrade to 13.0
 			</div>
 		</fieldset>
 
-	    <div class="cf_actions" id="cf_actions" style="display:none;">
-			<input id="cfbar-addbutton" class="allbuttons addbutton" type="submit" name="addbutton" value=""/>
-			<input id="cfbar-dupbutton" class="allbuttons dupbutton" type="submit" name="dupbutton" value=""/>
-			<input id="cfbar-delbutton" class="allbuttons deleteall" type="submit" name="delbutton" value=""/>
-			<input id="preset" type="button" class="jqModalInstall allbuttons" name="<?php echo $cforms_root; ?>/js/include/" value=""/>
-			<input id="backup" type="button" class="jqModalBackup allbuttons" name="backup"  value=""/>
-			<input id="cfbar-SubmitOptions" type="submit" name="SubmitOptions" class="allbuttons updbutton formupd" value="" />
+	    <div class="cf_actions" id="cf_actions">
+	        <div class="cflegend op-closed" id="p31"><div class="blindplus"></div><p><?php _e('Admin Actions','cforms'); ?></p></div>
+	        <div class="cf-content" id="o31">
+                <p class="m1">
+                <input class="allbuttons addbutton" type="submit" name="addbutton" title="<?php _e('adds a new form with default values', 'cforms'); ?>" value="<?php _e('Add new form', 'cforms'); ?>"/><br />
+                <input class="allbuttons dupbutton" type="submit" name="dupbutton" title="<?php _e('clones the current form', 'cforms'); ?>" value="<?php _e('Duplicate current form', 'cforms'); ?>"/>
+                </p>
+				<?php
+	            	if ( (int)$cformsSettings['global']['cforms_formcount'] > 1)
+    	        		echo '<p class="m2"><input class="allbuttons deleteall" title="'.__('Clicking this button WILL delete this form.', 'cforms').'" type="submit" onclick="return confirm(\''.__('This will delete the current form!', 'cforms').'\')" name="delbutton" value="'.__('Delete current form (!)', 'cforms').'"/></p>';
+        		?>
+				<p class="m3"><input type="button" class="jqModalInstall allbuttons" name="<?php echo $cforms_root; ?>/js/include/" id="preset" value="<?php _e('Install a form preset', 'cforms'); ?>"/></p>
+				<p class="m4"><input type="button" class="jqModalBackup allbuttons" name="backup" id="backup" value="<?php _e('Backup and Restore Settings', 'cforms'); ?>"/></p>
+	            <p class="m5"><input type="submit" name="SubmitOptions" class="allbuttons updbutton formupd" value="<?php _e('Update Settings &raquo;', 'cforms') ?>" onclick="javascript:document.mainform.action='#'+getFieldset(focusedFormControl);" /></p>
+	        </div>
 	    </div>
 
 		</form>

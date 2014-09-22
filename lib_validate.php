@@ -4,15 +4,10 @@
 ###
 ###
 
-$inpFieldArr = array(); // for var[] type input fields
-
 $cflimit = '';
 $filefield = 0;
 
 $captchaopt = $cformsSettings['global']['cforms_captcha_def'];
-
-###debug
-db("lib_validate.php: validating fields for form no. $no");
 
 for($i = 1; $i <= $field_count; $i++) {
 
@@ -44,8 +39,6 @@ for($i = 1; $i <= $field_count; $i++) {
 		$field_required = $field_stat[2];
 		$field_emailcheck = $field_stat[3];
 
-		###debug
-		db("\t ...validating field $field_name");
 
 		### ommit certain fields; validation only!
 		if( in_array($field_type,array('cauthor','url','email')) ){
@@ -73,65 +66,26 @@ for($i = 1; $i <= $field_count; $i++) {
 
 		### comment luv
 		get_currentuserinfo();
-		
 		global $user_level;
-				
 		if( in_array($field_type,array('luv')) && $user_level==10 )
 			continue;
 
 		### input field names & label
 		$custom_names = ($cformsSettings['form'.$no]['cforms'.$no.'_customnames']=='1')?true:false;
-		$isFieldArray = false;
 
 		if ( $custom_names ){
 
-			###preg_match('/^([^#\|]*).*/',$field_name,$input_name);
-			$tmpName = $field_name; ###hardcoded for now
+			preg_match('/^([^#\|]*).*/',$field_name,$input_name);
 
-			###debug
-			db("\t\t ...custom names/id's...($tmpName)");
+			if ( strpos($input_name[1],'[id:')!==false ){
+				$idPartA = strpos($input_name[1],'[id:');
+				$idPartB = strpos($input_name[1],']',$idPartA);
+				$current_field = $_REQUEST[ cf_sanitize_ids( substr($input_name[1],$idPartA+4,($idPartB-$idPartA)-4) ) ];
 
-			if ( strpos($tmpName,'[id:')!==false ){
+				$field_name = substr_replace($input_name[1],'',$idPartA,($idPartB-$idPartA)+1);
+			} else
+				$current_field = $_REQUEST[ cf_sanitize_ids($input_name[1]) ];
 
-				$isFieldArray = strpos($tmpName,'[]');
-				
-				preg_match('/^([^\[]*)\[id:([^\|]+(\[\])?)\]([^\|]*).*/',$tmpName,$input_name); // 2.6.2012  
-				$field_name = $input_name[1].$input_name[4];
-				$trackingID	= cf_sanitize_ids( $input_name[2] );
-
-//		 	echo '<br><pre>'.$tmpName . print_r($input_name,1).'</pre>';
-
-/* 
-	First Name[id:firstname]yy||^[A-Za-z ]*$Array
-	(
-		[0] => First Name[id:firstname]yy||^[A-Za-z ]*$
-		[1] => First Name
-		[2] => firstname
-		[3] => 
-		[4] => yy
-	)
-*/
-				if( $isFieldArray ){				
-
-					if( !$inpFieldArr[$trackingID] || $inpFieldArr[$trackingID]=='' )
-						$inpFieldArr[$trackingID]=0;
-					
-					$current_field	= $_REQUEST[ $trackingID ][$inpFieldArr[$trackingID]++];
-									
-				} else 
-					$current_field	= $_REQUEST[ $trackingID ];
-
-				db("\t\t\t ...currentField field_name = \"$field_name\", current_field = $current_field, request-id = $trackingID");
-
-				
-			} else {
-					if( strpos($tmpName,'#')!==false && strpos($tmpName,'#')==0 )
-						preg_match('/^#([^\|]*).*/',$field_name,$input_name); ###special case with checkboxes w/ right label only & no ID
-					else
-						preg_match('/^([^#\|]*).*/',$field_name,$input_name); ###just take front part
-					$current_field = $_REQUEST[ cf_sanitize_ids($input_name[1]) ];
-			}
-			
 		}
 		else
 			$current_field = $_REQUEST['cf'.$no.'_field_' . ((int)$i+(int)$off)];
@@ -142,9 +96,6 @@ for($i = 1; $i <= $field_count; $i++) {
 		$current_field = is_array($current_field) ? $current_field : stripslashes($current_field);
 
 		if( $field_emailcheck ) {  ### email field
-
-				###debug
-				db("\t\t ...found email field ($current_field) is_email = ".cforms_is_email( $current_field ));
 
 				### special email field in WP Commente
 				if ( $field_type=='email' )
@@ -157,11 +108,7 @@ for($i = 1; $i <= $field_count; $i++) {
 		}
 		else if( $field_required && !in_array($field_type,array('verification','captcha'))  ) { ### just required
 
-				###debug
-				db("\t\t ...is required! check: current_field=$current_field");
-
-				if( in_array($field_type,array( 'html5color','html5date','html5datetime','html5datetime-local','html5email','html5month','html5number','html5range','html5search','html5tel','html5time','html5url','html5week',
-												'cauthor','url','comment','pwfield','textfield','datepicker','textarea','yourname','youremail','friendsname','friendsemail')) ){
+				if( in_array($field_type,array('cauthor','url','comment','pwfield','textfield','datepicker','textarea','yourname','youremail','friendsname','friendsemail')) ){
 
 							$validations[$i+$off] = ($current_field=='')?false:true;
 
@@ -245,9 +192,6 @@ for($i = 1; $i <= $field_count; $i++) {
   					else { ### classic regexp
 						$reg_exp = str_replace('/','\/',stripslashes($obj[2]) );
 
-						###debug
-						db("\t\t ...REGEXP check content: $current_field =? $reg_exp");
-				
 						### multi-line textarea regexp trick
 						if( $field_type == 'textarea' )
 						    $valField = (string)str_replace(array("\r", "\r\n", "\n"), ' ', $current_field);
@@ -344,16 +288,16 @@ if( isset($_FILES['cf_uploadfile'.$no]) && $all_valid){
 switch($err){
 	case 0: break;
 	case 1:
-			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), '<span>'.$cformsSettings['form'.$no]['cforms'.$no.'_failure'].'</span>' );
+			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), $cformsSettings['form'.$no]['cforms'.$no.'_failure'] );
 			break;
 	case 2:
-			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), '<span>'.$cformsSettings['global']['cforms_codeerr'].'</span>' );
+			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), $cformsSettings['global']['cforms_codeerr'] );
 			break;
 	case 3:
-			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), '<span>'.$fileerr.'</span>');
+			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), $fileerr);
 			break;
 	case 4:
-			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), '<span>'.$cformsSettings['form'.$no]['cforms'.$no.'_failure'].'</span>' );
+			$usermessage_text = preg_replace ( array("|\\\'|",'/\\\"/','|\r\n|'),array('&#039;','&quot;','<br />'), $cformsSettings['form'.$no]['cforms'.$no.'_failure'] );
 			break;
 
 }
@@ -362,7 +306,7 @@ if ( $err<>0 && $c_errflag )
 
 ### proxy functions
 function cforms_is_email($string){
-	return preg_match("/^[_a-z0-9+-]+(\.[_a-z0-9+-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i", $string);
+	return eregi("^[_a-z0-9+-]+(\.[_a-z0-9+-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", $string);
 }
 
 ?>

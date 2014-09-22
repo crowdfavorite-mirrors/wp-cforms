@@ -408,7 +408,7 @@ class cf_mail {
 	    for($i = 0; $i < count($this->to); $i++)
           $to .= (($i != 0) ? ', ':'' ) . $this->addr_fmt($this->to[$i]);
 
-	    $to_all = explode(',', $to);
+	    $to_all = split(',', $to);
 	    $params = sprintf("-oi -f %s", $this->sender);
 
 	    if ($this->sender != '' && strlen(ini_get('safe_mode'))< 1) {

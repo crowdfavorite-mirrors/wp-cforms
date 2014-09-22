@@ -61,7 +61,6 @@ if ( isset($_REQUEST['deletetables']) ) {
 // Update Settings
 if( isset($_REQUEST['SubmitOptions']) ) {
 
-    $cformsSettings['global']['cforms_html5'] = $_REQUEST['cforms_html5']?'1':'0';
     $cformsSettings['global']['cforms_show_quicktag'] = $_REQUEST['cforms_show_quicktag']?'1':'0';
 	$cformsSettings['global']['cforms_sec_qa'] = 		magic($_REQUEST['cforms_sec_qa']);
 	$cformsSettings['global']['cforms_codeerr'] = 		magic($_REQUEST['cforms_codeerr']);
@@ -80,7 +79,6 @@ if( isset($_REQUEST['SubmitOptions']) ) {
 	$nav[3]=magic($_REQUEST['cforms_dp_nextM']);
 	$nav[4]=magic($_REQUEST['cforms_dp_close']);
 	$nav[5]=magic($_REQUEST['cforms_dp_choose']);
-	$nav[6]=$_REQUEST['cforms_dp_Ybuttons']?'1':'0';
 	$cformsSettings['global']['cforms_dp_nav'] = $nav;
 
  	$cformsSettings['global']['cforms_inexclude']['ex'] = '';
@@ -212,34 +210,24 @@ abspath_check();
 <div class="wrap" id="top">
     <div id="icon-cforms-global" class="icon32"><br/></div><h2><?php _e('Global Settings','cforms')?></h2>
 
-    <?php if ( isset($_POST['showinfo']) ) : ###debug "easter egg" 
+    <?php
+    ###debug "easter egg"
+    if ( isset($_POST['showinfo']) ){
 
         echo '<h2>'.__('Debug Info (all major setting groups)', 'cforms').'</h2><br/><pre style="font-size:11px;background-color:#F5F5F5;">';
         echo print_r(array_keys($cformsSettings),1)."</pre>";
         echo '<h2>'.__('Debug Info (all cforms settings)', 'cforms').'</h2><br/><pre style="font-size:11px;background-color:#F5F5F5;">'.print_r($cformsSettings,1)."</pre>";
-    
-	else : ?>
-	
+
+        cforms_footer();
+        echo '</div>';
+        die();
+    }
+    ?>
     <p><?php _e('All settings and configuration options on this page apply to all forms.', 'cforms') ?></p>
 
 	<form enctype="multipart/form-data" id="cformsdata" name="mainform" method="post" action="">
 		<input type="hidden" name="cforms_database_new" value="<?php if($cformsSettings['global']['cforms_database']=="0") echo 'true'; ?>"/>
 
-		<fieldset id="wpeditor" class="cformsoptions">
-			<div class="cflegend op-closed" id="p31" title="<?php _e('Expand/Collapse', 'cforms') ?>">
-            	<a class="helptop" href="#top"><?php _e('top', 'cforms'); ?></a><div class="blindplus"></div><?php _e('HTML5 Input Field Support', 'cforms')?>
-            </div>
-
-			<div class="cf-content" id="o31">
-				<table class="form-table">
-					<tr class="ob">
-						<td class="obL"></td>
-						<td class="obR"><input class="allchk" type="checkbox" id="cforms_html5" name="cforms_html5" <?php if($cformsSettings['global']['cforms_html5']=="1") echo "checked=\"checked\""; ?>/> <label for="cforms_html5"><strong><?php _e('Enable HTML5 fields', 'cforms') ?></strong></label></td>
-					</tr>
-				</table>
-			</div>
-		</fieldset>
-		
 		<fieldset id="wpcomment" class="cformsoptions">
 			<div class="cflegend op-closed" id="p28" title="<?php _e('Expand/Collapse', 'cforms') ?>">
             	<a class="helptop" href="#top"><?php _e('top', 'cforms'); ?></a><div class="blindplus"></div><?php _e('WP Comment Feature Settings', 'cforms')?>
@@ -364,7 +352,7 @@ abspath_check();
 
 				<tr class="ob space15">
 					<td class="obL"><label for="cforms_dp_date"><strong><?php _e('Date Format', 'cforms'); ?></strong></label></td>
-					<td class="obR"><input type="text" id="cforms_dp_date" name="cforms_dp_date" value="<?php echo stripslashes(htmlspecialchars( $cformsSettings['global']['cforms_dp_date'] )); ?>"/><a href="http://docs.jquery.com/UI/Datepicker/formatDate" target="_blank"><?php _e('See supported date formats &raquo;', 'cforms'); ?></a></td>
+					<td class="obR"><input type="text" id="cforms_dp_date" name="cforms_dp_date" value="<?php echo stripslashes(htmlspecialchars( $cformsSettings['global']['cforms_dp_date'] )); ?>"/></td>
 				</tr>
 				<tr class="ob">
 					<td class="obL"><label for="cforms_dp_days"><strong><?php _e('Days (Columns)', 'cforms'); ?></strong></label></td>
@@ -376,12 +364,16 @@ abspath_check();
 				</tr>
 				<tr class="ob">
 					<?php $nav = $cformsSettings['global']['cforms_dp_nav']; ?>
-					<td class="obL"></td>
-					<td class="obR"><input class="allchk" type="checkbox" id="cforms_dp_Ybuttons" name="cforms_dp_Ybuttons" <?php if($nav[6]=="1") echo "checked=\"checked\""; ?>/><label for="cforms_dp_Ybuttons"><strong><?php _e('Enable year selection drop down', 'cforms') ?></strong></label></td>
+					<td class="obL"><label for="cforms_dp_prevY"><strong><?php _e('Previous Year', 'cforms'); ?></strong></label></td>
+					<td class="obR"><input type="text" id="cforms_dp_prevY" name="cforms_dp_prevY" value="<?php echo stripslashes(htmlspecialchars( $nav[0] )); ?>"/></td>
 				</tr>
 				<tr class="ob">
 					<td class="obL"><label for="cforms_dp_prevM"><strong><?php _e('Previous Month', 'cforms'); ?></strong></label></td>
 					<td class="obR"><input type="text" id="cforms_dp_prevM" name="cforms_dp_prevM" value="<?php echo stripslashes(htmlspecialchars( $nav[1] )); ?>"/></td>
+				</tr>
+				<tr class="ob">
+					<td class="obL"><label for="cforms_dp_nextY"><strong><?php _e('Next Year', 'cforms'); ?></strong></label></td>
+					<td class="obR"><input type="text" id="cforms_dp_nextY" name="cforms_dp_nextY" value="<?php echo stripslashes(htmlspecialchars( $nav[2] )); ?>"/></td>
 				</tr>
 				<tr class="ob">
 					<td class="obL"><label for="cforms_dp_nextM"><strong><?php _e('Next Month', 'cforms'); ?></strong></label></td>
@@ -609,7 +601,7 @@ abspath_check();
 					$i  = prep2( $cap['i'],'i' );
 					$ac = prep2( $cap['ac'],'abcdefghijkmnpqrstuvwxyz23456789' );
 
-					//$img = "&amp;c1={$c1}&amp;c2={$c2}&amp;ac={$ac}&amp;i={$i}&amp;w={$w}&amp;h={$h}&amp;c={$c}&amp;l={$l}&amp;f={$f}&amp;a1={$a1}&amp;a2={$a2}&amp;f1={$f1}&amp;f2={$f2}&amp;bg={$bg}";
+					$img = "&amp;c1={$c1}&amp;c2={$c2}&amp;ac={$ac}&amp;i={$i}&amp;w={$w}&amp;h={$h}&amp;c={$c}&amp;l={$l}&amp;f={$f}&amp;a1={$a1}&amp;a2={$a2}&amp;f1={$f1}&amp;f2={$f2}&amp;b={$bg}";
 
 					$fonts = '<select name="cforms_cap_f" id="cforms_cap_f">'.cf_get_files('captchafonts',$f,'ttf').'</select>';
 					$backgrounds = '<select name="cforms_cap_b" id="cforms_cap_b">'.cf_get_files('captchabg',$bg,'gif').'</select>';
@@ -796,7 +788,7 @@ abspath_check();
 					<td class="obR">
 						<input name="cforms_rsskeyall" id="cforms_rsskey" value="<?php echo $cformsSettings['global']['cforms_rsskeyall'];  ?>" />
 						<input type="submit" name="cforms_rsskeysnew" id="cforms_rsskeysnew" value="<?php _e('Reset RSS Key', 'cforms');  ?>" class="allbuttons"  onclick="javascript:document.mainform.action='#tracking';"/>
-						<br /><?php _e('The complete RSS URL &raquo;', 'cforms'); echo '<br />'.get_cf_siteurl().'?cformsRSS='.urlencode('-1$#$').$cformsSettings['global']['cforms_rsskeyall']; ?>
+						<br /><?php _e('The complete RSS URL &raquo;', 'cforms'); echo '<br />'.get_option('siteurl').'?cformsRSS='.urlencode('-1$#$').$cformsSettings['global']['cforms_rsskeyall']; ?>
 					</td>
 				</tr>
 				<?php endif; ?>
@@ -805,18 +797,23 @@ abspath_check();
 			</div>
 		</fieldset>
 
-	    <div class="cf_actions" id="cf_actions" style="display:none;">
-			<input id="cfbar-showinfo" class="allbuttons addbutton" type="submit" name="showinfo" value=""/>
-			<input id="cfbar-deleteall" class="jqModalDelAll allbuttons deleteall" type="button" name="deleteallbutton" value=""/>
-			<input id="deletetables" class="allbuttons deleteall" type="submit" name="deletetables" value=""/>
-			<input id="backup" type="button" class="jqModalBackup allbuttons" name="backup"  value=""/>
-			<input id="cfbar-SubmitOptions" type="submit" name="SubmitOptions" class="allbuttons updbutton formupd" value="" />
+	    <div class="cf_actions" id="cf_actions">
+	        <div class="cflegend op-closed" id="p31"><div class="blindplus"></div><p><?php _e('Admin Actions','cforms'); ?></p></div>
+	        <div class="cf-content" id="o31">
+				<p class="m1"><input type="submit" name="showinfo" title="<?php _e('outputs -for debug purposes- all cforms settings', 'cforms') ?>" class="allbuttons addbutton" value="<?php _e('Produce Debug Output', 'cforms') ?>"/></p>
+
+				<p class="m4"><input type="button" class="jqModalDelAll allbuttons deleteall" value="<?php _e('Uninstalling / Removing cforms', 'cforms'); ?>"/></p>
+				<?php if ( $wpdb->get_var("show tables like '$wpdb->cformssubmissions'") == $wpdb->cformssubmissions ) :?>
+				<p class="m2"><input id="deletetables" type="submit" title="<?php _e('Be careful with this one!', 'cforms') ?>" name="deletetables" class="allbuttons deleteall" value="<?php _e('Delete cforms Tracking Tables', 'cforms') ?>" onclick="return confirm('<?php _e('Do you really want to erase all collected data?', 'cforms') ?>');"/></p>
+				<?php endif; ?>
+
+                <p class="m4"><input type="button" class="jqModalBackup allbuttons" value="<?php _e('Backup &amp; Restore All Settings', 'cforms'); ?>"/></p>
+	            <p class="m5"><input type="submit" name="SubmitOptions" class="allbuttons updbutton formupd" value="<?php _e('Update Settings &raquo;', 'cforms') ?>" onclick="javascript:document.mainform.action='#'+getFieldset(focusedFormControl);" /></p>
+	        </div>
 	    </div>
-		
+
 	</form>
 
-	<?php endif; ### not showing debug msgs. ?> 
-	
 	<?php cforms_footer(); ?>
 </div>
 
@@ -847,16 +844,14 @@ abspath_check();
             <div class="controls">
 				<p><?php _e('Generally, simple deactivation of cforms does <strong>not</strong> erase any of its data. If you like to quit using cforms for good, please erase all data before deactivating the plugin.', 'cforms') ?></p>
 				<p><strong><?php _e('This is irrevocable!', 'cforms') ?></strong>&nbsp;&nbsp;&nbsp;<br />
-					 <input type="submit" name="cfdeleteall" title="<?php _e('Are you sure you want to do this?!', 'cforms') ?>" class="allbuttons deleteall" value="<?php _e('DELETE *ALL* CFORMS DATA', 'cforms') ?>" onclick="return confirm('<?php _e('Final Warning!', 'cforms') ?>');"/></p>
+					 <input type="submit" name="cfdeleteall" title="<?php _e('Are you sure you want to do this?!', 'cforms') ?>" class="allbuttons deleteall" value="<?php _e('DELETE *ALL* CFORMS DATA', 'cforms') ?>" onclick="return confirm('<?php _e('Final Warning!', 'cforms') ?>');"/>
 
                 <p class="cancel"><a href="#" id="cancel" class="jqmClose"><img src="<?php echo $cforms_root; ?>/images/dialog_cancel.gif" alt="<?php _e('Cancel', 'cforms') ?>" title="<?php _e('Cancel', 'cforms') ?>"/></a></p>
             </div>
         </form>
     </div>
 </div>
-
 <?php
-
 function cf_get_files($dir,$currentfile,$ext){
 	global	$cformsSettings;
 
@@ -871,7 +866,7 @@ function cf_get_files($dir,$currentfile,$ext){
 
 		if ($handle = opendir($presetsdir)) {
 		    while (false !== ($file = readdir($handle))) {
-		        if (preg_match('/\.'.$ext.'$/i',$file) && $file != "." && $file != ".." && filesize($presetsdir.'/'.$file) > 0)
+		        if (eregi('\.'.$ext.'$',$file) && $file != "." && $file != ".." && filesize($presetsdir.'/'.$file) > 0)
 					$list .= '<option value="../../cforms-custom/'.$file.'"'.(('../../cforms-custom/'.$file==$currentfile)?' style="background:#fbd0d3" selected="selected"':'').'>' .$file. '</option>';
 		    }
 		    closedir($handle);
@@ -883,7 +878,7 @@ function cf_get_files($dir,$currentfile,$ext){
 	$presetsdir		= $cformsSettings['global']['cforms_root_dir'].$s. $dir .$s;
 	if ($handle = opendir($presetsdir)) {
 	    while (false !== ($file = readdir($handle))) {
-	        if (preg_match('/\.'.$ext.'$/i',$file) && $file != "." && $file != ".." && filesize($presetsdir.$file) > 0)
+	        if (eregi('\.'.$ext.'$',$file) && $file != "." && $file != ".." && filesize($presetsdir.$file) > 0)
 				$list .= '<option value="'.$file.'"'.(($file==$currentfile)?' style="background:#fbd0d3" selected="selected"':'').'>' .$file. '</option>';
 	    }
 	    closedir($handle);

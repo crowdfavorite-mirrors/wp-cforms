@@ -1,7 +1,5 @@
 <?php
 
-load_plugin_textdomain( 'cforms' );
-
 ### adding TinyMCE button
 function cforms_addbuttons() {
 		global $wp_db_version, $cforms_root;

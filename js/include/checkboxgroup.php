@@ -9,10 +9,7 @@ if ( file_exists( $abspath . 'wp-load.php') )
 	require_once( $abspath . 'wp-load.php' );
 else
 	require_once( $abspath . 'wp-config.php' );
-
-load_plugin_textdomain( 'cforms' );
 ?>
-
 
 <form method="post">
 
@@ -33,7 +30,7 @@ load_plugin_textdomain( 'cforms' );
 	<label style="clear:left; padding-top:5px;" for="cf_edit_title"><?php _e('Input field title (displayed when mouse hovers over field)', 'cforms'); ?></label>
 	<input type="text" id="cf_edit_title" name="cf_edit_title" value="">
 
-	<!--label for="cf_edit_customerr"><?php _e('Custom error message (make sure to enable custom, per field err messages!)', 'cforms'); ?></label-->
-	<!--input type="text" id="cf_edit_customerr" name="cf_edit_customerr" value=""-->
+	<label for="cf_edit_customerr"><?php _e('Custom error message (make sure to enable custom, per field err messages!)', 'cforms'); ?></label>
+	<input type="text" id="cf_edit_customerr" name="cf_edit_customerr" value="">
 
 </form>

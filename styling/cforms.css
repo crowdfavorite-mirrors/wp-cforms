@@ -390,6 +390,7 @@ div.mailerr {
 	margin:0 auto 10px!important;
 	padding:0!important;	
 	text-align:center!important;
+	display: none;
 }
 .linklove a,
 .linklove a:visited {

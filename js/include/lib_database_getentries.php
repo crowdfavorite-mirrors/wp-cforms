@@ -14,9 +14,10 @@ if ( !defined('ABSPATH') ){
 	    require_once( $abspath . 'wp-config.php' );
 }
 
-### mini firewall
 if( !current_user_can('track_cforms') )
 	wp_die("access restricted.");
+
+### mini firewall
 
 global $wpdb;
 
@@ -25,14 +26,6 @@ $wpdb->cformsdata       	= $wpdb->prefix . 'cformsdata';
 
 ### new global settings container, will eventually be the only one!
 $cformsSettings = get_option('cforms_settings');
-
-### get custom functions
-$CFfunctionsC = dirname(dirname(dirname(dirname(__FILE__)))).$cformsSettings['global']['cforms_IIS'].'cforms-custom'.$cformsSettings['global']['cforms_IIS'].'my-functions.php';
-$CFfunctions = dirname(dirname(dirname(__FILE__))).$cformsSettings['global']['cforms_IIS'].'my-functions.php';
-if ( file_exists($CFfunctionsC) )
-    include_once($CFfunctionsC);
-else if ( file_exists($CFfunctions) )
-    include_once($CFfunctions);
 
 ### get form names
 for ($i=1; $i <= $cformsSettings['global']['cforms_formcount']; $i++){
@@ -103,7 +96,7 @@ if ($showIDs<>'') {
 
 				echo '<div class="showform" id="entry'.$entry->sub_id.'">'.
 					 '<table class="dataheader"><tr><td>'.__('Form:','cforms').' </td><td class="b">'. stripslashes($cformsSettings['form'.$entry->form_id]['cforms'.$entry->form_id.'_fname']) . '</td><td class="e">(ID:' . $entry->sub_id . ')</td><td class="d">' . $time.' &nbsp; '.$date. '</td>' .
-					 '<td class="s">&nbsp;</td><td><a href="#" class="xdatabutton allbuttons deleteall" type="submit" id="xbutton'.$entry->sub_id.'">'.__('Delete this entry', 'cforms').'</a></td>' .
+					 '<td class="s">&nbsp;</td><td><a class="xdatabutton" type="submit" id="xbutton'.$entry->sub_id.'" title="'.__('delete this entry', 'cforms').'" value=""></a></td>' .
 					 '<td><a class="cdatabutton" type="submit" id="cbutton'.$entry->sub_id.'" title="'.__('close this entry', 'cforms').'" value=""></a></td>' .
                      "</tr></table>\n";
 			}
@@ -127,19 +120,9 @@ if ($showIDs<>'') {
 					else
 	                    $fileurl = $fileuploaddirurl;
 
+                    $fileurl .= '/'.$subID.strip_tags($val);
 
-					$passID = ($cformsSettings['form'.$no]['cforms'.$no.'_noid']) ? '':$entry->sub_id;
-					$fileInfoArr = array('name'=>strip_tags($val), 'path'=>$fileurl, 'subID'=>$passID);
-
-					if ( function_exists('my_cforms_logic') )
-						$fileInfoArr = my_cforms_logic( $results, $fileInfoArr, 'fileDestinationTrackingPage');
-
-					if( ! array_key_exists('modified', $fileInfoArr) )
-						$fileInfoArr['name'] = $subID . $fileInfoArr['name'];
-					
-					$fileurl = $fileInfoArr['path'] . '/' . $fileInfoArr['name'] . $format;
-					
-					echo '<div class="showformfield meta"><div class="L">';
+					echo '<div class="showformfield" style="margin:4px 0;color:#3C575B;"><div class="L">';
 					echo substr($name, 0,strpos($name,'[*'));
 					if ( $entry->field_val == '' )
 						echo 	'</div><div class="R">' . __('-','cforms') . '</div></div>' . "\n";
@@ -149,11 +132,11 @@ if ($showIDs<>'') {
 			}
 			elseif ($name=='page') {  // special field: page
 
-					echo '<div class="showformfield meta"><div class="L">';
+					echo '<div class="showformfield" style="color:#3C575B;"><div class="L">';
 					_e('Submitted via page', 'cforms');
 					echo 	'</div><div class="R">' . str_replace("\n","<br />", strip_tags($val) ) . '</div></div>' . "\n";
 
-					echo '<div class="showformfield meta"><div class="L">';
+					echo '<div class="showformfield" style="margin-bottom:10px;color:#3C575B;"><div class="L">';
 					_e('IP address', 'cforms');
 					echo 	'</div><div class="R"><a href="http://geomaplookup.net/?ip='.$entry->ip.'" title="'.__('IP Lookup', 'cforms').'">'.$entry->ip.'</a></div></div>' . "\n";
 

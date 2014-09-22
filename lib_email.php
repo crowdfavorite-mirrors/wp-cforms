@@ -411,8 +411,11 @@ class cf_mail {
 	    for($i = 0; $i < count($this->to); $i++)
           $to .= (($i != 0) ? ', ':'' ) . $this->addr_fmt($this->to[$i]);
 
-	    $to_all = explode(',', $to);
-	    $params = sprintf("-oi -f %s", $this->sender);
+	    $to_all = split(',', $to);
+		// Original line	    
+		// $params = sprintf("-oi -f %s", $this->sender);
+	    // CHANGE: force in email address given since $this->sender isn't always set.
+	    $params = "-oi -f " . $this->replyto[0][0];
 
 	    if ($this->sender != '' && strlen(ini_get('safe_mode'))< 1) {
 	      $old_from = ini_get('sendmail_from');
@@ -427,7 +430,10 @@ class cf_mail {
 	        foreach ($to_all as $key => $val)
 	          $rt = @mail($val, $this->enc_h($this->fix_header($this->subj)), $body, $header, $params);
 	      } else
-	        $rt = @mail($to, $this->enc_h($this->fix_header($this->subj)), $body, $header);
+			// Original line	    
+			// $rt = @mail($to, $this->enc_h($this->fix_header($this->subj)), $body, $header);
+	      	// Chagne: send parameters no matter what.
+	        $rt = @mail($to, $this->enc_h($this->fix_header($this->subj)), $body, $header, $params);
 	    }
 
 	    if (isset($old_from))

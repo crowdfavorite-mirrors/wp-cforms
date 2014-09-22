@@ -1,51 +1,33 @@
 <?php
-### supporting WP2.6 wp-load & custom wp-content / plugin dir
-if ( file_exists('abspath.php') )
-	include_once('abspath.php');
-else
-	$abspath='../../../';
-	
-if ( file_exists( $abspath . 'wp-load.php') )
-	require_once( $abspath . 'wp-load.php' );
-else
-	require_once( $abspath . 'wp-config.php' );
-
-$cformsSettings = get_option('cforms_settings');
-$cap = $cformsSettings['global']['cforms_captcha_def'];
-
-### overwrite for admin demo purposes, no cookie set though
-if ( count($_GET)>2 )
-	$cap = $_GET;
-
-$min = prepVal( $cap['c1'],4 );
-$max = prepVal( $cap['c2'],5 );
-$src = prepVal( $cap['ac'], 'abcdefghijkmnpqrstuvwxyz23456789');
+$min = prep( $_REQUEST['c1'],4 );
+$max = prep( $_REQUEST['c2'],5 );
+$src = prep( $_REQUEST['ac'], 'abcdefghijkmnpqrstuvwxyz23456789');
 
 $img_sz_type	= 0;
-$img_sz_width	= prepVal($cap['w'],115);
-$img_sz_height	= prepVal($cap['h'],25);
+$img_sz_width	= prep($_REQUEST['w'],115);
+$img_sz_height	= prep($_REQUEST['h'],25);
 
 $im_bg			= 0;
 $im_bg_type		= 1;
-$im_bg_url		= 'captchabg/' . ( prepVal($cap['bg'],'1.gif') );
+$im_bg_url		= 'captchabg/' . ( prep($_REQUEST['b'],'1.gif') );
 
 $fontUsed		= 0;
-$font_url		= 'captchafonts/' . ( prepVal($cap['f'],'font4.ttf') );
+$font_url		= 'captchafonts/' . ( prep($_REQUEST['f'],'font4.ttf') );
 $fonts_dir		= 'captchafonts';
 
-$min_font_size	= prepVal($cap['f1'],17);
-$max_font_size	= prepVal($cap['f2'],19);
+$min_font_size	= prep($_REQUEST['f1'],17);
+$max_font_size	= prep($_REQUEST['f2'],19);
 
-$min_angle		= prepVal($cap['a1'],-12);
-$max_angle		= prepVal($cap['a2'],12);
+$min_angle		= prep($_REQUEST['a1'],-12);
+$max_angle		= prep($_REQUEST['a2'],12);
 
 $col_txt_type	= 4;
-$col			= prepVal($cap['c'],'000066');
+$col			= prep($_REQUEST['c'],'000066');
 $col_txt_r		= hexdec(substr($col,0,2));
 $col_txt_g		= hexdec(substr($col,2,2));
 $col_txt_b		= hexdec(substr($col,4,2));
 
-$border			= prepVal($cap['l'],'000066');
+$border			= prep($_REQUEST['l'],'000066');
 $border_r		= hexdec(substr($border,0,2));
 $border_g		= hexdec(substr($border,2,2));
 $border_b		= hexdec(substr($border,4,2));
@@ -53,7 +35,7 @@ $border_b		= hexdec(substr($border,4,2));
 $char_padding	= 2;
 $output_type	= 'png';
 
-$no 			= prepVal($_GET['ts'],'');
+$no 			= prep($_REQUEST['ts'],'');
 
 ### captcha random code
 $srclen = strlen($src)-1;
@@ -63,12 +45,9 @@ $turing = '';
 for($i=0; $i<$length; $i++)
 	$turing .= substr($src, mt_rand(0, $srclen), 1);
 
-$tu = ($cap['i']=='i')?strtolower($turing):$turing;
+$tu = ($_REQUEST['i']=='i')?strtolower($turing):$turing;
 
-//die( 'turing_string_'.$no.'***'.$cap['i'].'+'.md5($tu).'***'.(time()+60*60*5).'***'."/" );
-
-if ( ! ( isset($_GET['c1']) || isset($_GET['c2']) || isset($_GET['ac']) ) )
-	setcookie("turing_string_".$no, $cap['i'].'+'.md5($tu),(time()+60*60*5),"/");
+setcookie('turing_string_'.$no, $_REQUEST['i'].'+'.md5($tu),(time()+60*60*5),"/");
 
 if ($fontUsed == 1 ) {
 	$fontno = mt_rand(1,34);
@@ -182,7 +161,7 @@ switch ($output_type) {
 ImageDestroy($im);
 
 ### strip stuff
-function prepVal($v,$d) {
+function prep($v,$d) {
 	return ($v<>'') ? stripslashes($v) : $d;
 }
 ?>

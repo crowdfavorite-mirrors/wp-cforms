@@ -35,7 +35,7 @@ function reset_captcha( $no = '' ){
 
 	$path = get_bloginfo('wpurl') . $path;
 
-	$newimage = 'newcap|'.$no.'|'.$path.'/cforms-captcha.php?ts='.$no;
+	$newimage = 'newcap|'.$no.'|'.$path.'/cforms-captcha.php?ts='.$no.str_replace('&amp;','&',get_captcha_uri());
 	return $newimage;
 }
 
@@ -46,7 +46,7 @@ function cforms_submitcomment($content) {
 	global $cformsSettings, $wpdb, $subID, $smtpsettings, $track, $trackf, $Ajaxpid, $AjaxURL, $wp_locale, $abspath;
 
     $WPsuccess=false;
-	
+
 	### WP Comment flag
 	$isAjaxWPcomment = strpos($content,'***');###  WP comment feature
 
@@ -111,8 +111,6 @@ function cforms_submitcomment($content) {
 
 	$taf_youremail = false;
 	$taf_friendsemail = false;
-
-	$isFieldArray = false;
 
 	###  form limit reached
 	if ( ($cformsSettings['form'.$no]['cforms'.$no.'_maxentries']<>'' && get_cforms_submission_left($no)==0) || !cf_check_time($no) ){
@@ -193,18 +191,10 @@ function cforms_submitcomment($content) {
 
 			### remove [id: ] first
 			if ( strpos($field_name,'[id:')!==false ){
-				
-				preg_match('/^([^\[]*)\[id:([^\|]+(\[\])?)\]([^\|]*).*/',$field_name,$input_name); // 2.6.2012  
-				$field_name = $input_name[1].$input_name[4];
-				$customTrackingID	= cf_sanitize_ids( $input_name[2] );
-				
-				/* 2.6.2012
-				$isFieldArray = strpos($input_name[1],'[]');
 				$idPartA = strpos($field_name,'[id:');
-				$idPartB = strrpos($field_name,']',$idPartA); 
+				$idPartB = strpos($field_name,']',$idPartA);
 				$customTrackingID = substr($field_name,$idPartA+4,($idPartB-$idPartA)-4);
 				$field_name = substr_replace($field_name,'',$idPartA,($idPartB-$idPartA)+1);
-				*/
 			}
 			else
 				$customTrackingID='';
@@ -234,12 +224,8 @@ function cforms_submitcomment($content) {
 			}
 
 			###  special Tell-A-Friend fields
-			if ( $taf_friendsemail == '' && $field_type=='friendsemail' && $field_stat[3]=='1'){
-					
-					preg_match("/^[_a-z0-9+-]+(\.[_a-z0-9+-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/i", $params ['field_' . $i], $r);
-					$field_email = $taf_friendsemail = $r[1];  // double checking anti spam TAF
-
-			}
+			if ( $taf_friendsemail == '' && $field_type=='friendsemail' && $field_stat[3]=='1')
+					$field_email = $taf_friendsemail = $params ['field_' . $i];
 			if ( $taf_youremail == '' && $field_type=='youremail' && $field_stat[3]=='1')
 					$taf_youremail = $params ['field_' . $i];
 			if ( $field_type=='friendsname' )
@@ -268,9 +254,8 @@ function cforms_submitcomment($content) {
 			  $field_name = $field_name[0];
 
 				###  if ccbox & checked
-			  if ($field_type == "ccbox" && $params ['field_' . $i]<>"" ) //10.2. removed "-"
-			      ##$ccme = 'field_' . $i;
-			      $ccme = $field_name;
+			  if ($field_type == "ccbox" && $params ['field_' . $i]<>"-" )
+			      $ccme = 'field_' . $i;
 			}
 
 			if ( $field_type == "emailtobox" ){  			### special case where the value needs to bet get from the DB!
@@ -300,16 +285,7 @@ function cforms_submitcomment($content) {
 			if ( $field_type == "verification" )
 					$field_name = __('Q&A','cforms');
 
-			### check boxes
-			if ( $field_type == "checkbox" || $field_type == "ccbox" ) {
 
-					if ( $value == 'on' )
-						$value = '(x)';
-					else
-						$value = '';
-
-			}
-			
 			### determine tracked field name
 			$inc='';
 			$trackname=trim($field_name);
@@ -326,9 +302,6 @@ function cforms_submitcomment($content) {
 
 	} ###  for
 
-	###  prefilter user input
-	if( function_exists('my_cforms_filter') )
-        my_cforms_filter($no);
 
 	###  assemble text & html email
 	$r = formatEmail($track,$no);
@@ -368,9 +341,9 @@ function cforms_submitcomment($content) {
 			$to = $wpdb->get_results("SELECT U.user_email FROM $wpdb->users as U, $wpdb->posts as P WHERE P.ID = {$Ajaxpid} AND U.ID=P.post_author");
 			$to = $replyto = ($to[0]->user_email<>'')?$to[0]->user_email:$replyto;
 	}
-	else if ( !($to_one<>-1 && $to<>'') ){
+	else if ( !($to_one<>-1 && $to<>'') )
 		$to = $replyto = preg_replace( array('/;|#|\|/'), array(','), stripslashes($cformsSettings['form'.$no]['cforms'.$no.'_email']) );
-	}
+
 
 
 	### from
@@ -387,8 +360,6 @@ function cforms_submitcomment($content) {
 
 	### either use configured subject or user determined
 	$vsubject = stripslashes($cformsSettings['form'.$no]['cforms'.$no.'_subject']);
-	if (function_exists('my_cforms_logic'))
-		$vsubject = my_cforms_logic($trackf,$vsubject,'adminEmailSUBJ');
 	$vsubject = check_default_vars($vsubject,$no);
 	$vsubject = check_cust_vars($vsubject,$track,$no);
 
@@ -407,24 +378,18 @@ function cforms_submitcomment($content) {
 	    if ( function_exists('my_cforms_logic') )
 	        $htmlmessage = my_cforms_logic($trackf, $htmlmessage,'adminEmailHTML');
 		$htmlmessage = check_default_vars($htmlmessage,$no);
-	    $htmlmessage = check_cust_vars($htmlmessage,$track,$no,true);
+	    $htmlmessage = check_cust_vars($htmlmessage,$track,$no);
 
 	}
 
-	### custom user ReplyTo handling
-	if ( function_exists('my_cforms_logic') )
-		$userReplyTo = my_cforms_logic($trackf, $field_email, 'ReplyTo');
-	else
-		$userReplyTo = $field_email;
-	
-	$mail = new cf_mail($no,$frommail,$to,$userReplyTo, true);
+	$mail = new cf_mail($no,$frommail,$to,$field_email, true);
 	$mail->subj  = $vsubject;
 	$mail->char_set = 'utf-8';
 
 	### HTML email
 	if ( $mail->html_show ) {
 	    $mail->is_html(true);
-	    $mail->body     =  $cformsSettings['global']['cforms_style_doctype'] .$mail->eol."<html xmlns=\"http://www.w3.org/1999/xhtml\">".$mail->eol."<head><title></title></head>".$mail->eol."<body {$cformsSettings['global']['cforms_style']['body']}>".$htmlmessage.( $mail->f_html?$mail->eol.$htmlformdata:'').$mail->eol."</body></html>".$mail->eol;
+	    $mail->body     =  "<html>".$mail->eol."<body>".$htmlmessage.( $mail->f_html?$mail->eol.$htmlformdata:'').$mail->eol."</body></html>".$mail->eol;
 	    $mail->body_alt  =  $message . ($mail->f_txt?$mail->eol.$formdata:'');
 	}
 	else
@@ -439,11 +404,10 @@ function cforms_submitcomment($content) {
 	else
 	    $sentadmin = $mail->send();
 
-	if( $sentadmin == 1 )
+	if( $sentadmin==1 )
 	{
-
-		###  send copy or notification?
-	    if ( ($cformsSettings['form'.$no]['cforms'.$no.'_confirm']=='1' && $field_email<>'') || ($ccme&&$trackf[data][$ccme]<>'') )  ###  not if no email & already CC'ed
+		  ###  send copy or notification?
+	    if ( ($cformsSettings['form'.$no]['cforms'.$no.'_confirm']=='1' && $field_email<>'') || ($ccme&&$trackf[$ccme]<>'-') )  ###  not if no email & already CC'ed
 	    {
 
 	                $frommail = check_cust_vars(stripslashes($cformsSettings['form'.$no]['cforms'.$no.'_fromemail']),$track,$no);
@@ -462,14 +426,12 @@ function cforms_submitcomment($content) {
 	                    if ( function_exists('my_cforms_logic') )
 	                        $cmsghtml = my_cforms_logic($trackf, $cmsghtml,'autoConfHTML');
 	                    $cmsghtml = check_default_vars($cmsghtml,$no);
-	                    $cmsghtml = check_cust_vars($cmsghtml,$track,$no,true);
+	                    $cmsghtml = check_cust_vars($cmsghtml,$track,$no);
 	                }
 
 	                ### subject
 	                $subject2 = stripslashes($cformsSettings['form'.$no]['cforms'.$no.'_csubject']);
-					if (function_exists('my_cforms_logic'))
-						$subject2 = my_cforms_logic($trackf,$subject2,'autoConfSUBJ');
-					$subject2 = check_default_vars($subject2,$no);
+	                $subject2 = check_default_vars($subject2,$no);
 	                $subject2 = check_cust_vars($subject2,$track,$no);
 
 	                ###  different cc & ac subjects?
@@ -479,7 +441,7 @@ function cforms_submitcomment($content) {
 	                ###  email tracking via 3rd party?
 	                ###  if in Tell-A-Friend Mode, then overwrite header stuff...
 	                if ( $taf_youremail && $taf_friendsemail && $isTAF=='1' )
-	                    $field_email = "\"{$taf_friendsname}\" <{$taf_friendsemail}>"; ### sanitize taf_friendsemail !!!
+	                    $field_email = "\"{$taf_friendsname}\" <{$taf_friendsemail}>";
 	                else
 	                    $field_email = ($cformsSettings['form'.$no]['cforms'.$no.'_tracking']<>'')?$field_email.$cformsSettings['form'.$no]['cforms'.$no.'_tracking']:$field_email;
 
@@ -497,14 +459,14 @@ function cforms_submitcomment($content) {
 	                $mail->char_set = 'utf-8';
 
 	                ### CC or auto conf?
-	                if ( $ccme&&$trackf[data][$ccme]<>'' ) {
+	                if ( $ccme&&$trackf[$ccme]<>'-' ) {
 	                    if ( $smtpsettings[0]=='1' )
 	                        $sent = cforms_phpmailer( $no, $frommail, $replyto, $field_email, $s[1], $message, $formdata, $htmlmessage, $htmlformdata, 'ac' );
 	                    else{
 	                        $mail->subj = $s[1];
-	                        if ( $mail->html_show ) {  // 3.2.2012 changed from html_show_ac > admin email setting dictates this!
+	                        if ( $mail->html_show_ac ) {
 	                            $mail->is_html(true);
-	                            $mail->body     =  $cformsSettings['global']['cforms_style_doctype'] .$mail->eol."<html xmlns=\"http://www.w3.org/1999/xhtml\">".$mail->eol."<head><title></title></head>".$mail->eol."<body {$cformsSettings['global']['cforms_style']['body']}>".$htmlmessage.( $mail->f_html?$mail->eol.$htmlformdata:'').$mail->eol."</body></html>".$mail->eol;
+	                            $mail->body     =  "<html>".$mail->eol."<body>".$htmlmessage.( $mail->f_html?$mail->eol.$htmlformdata:'').$mail->eol."</body></html>".$mail->eol;
 	                            $mail->body_alt  =  $message . ($mail->f_txt?$mail->eol.$formdata:'');
 	                        }
 	                        else
@@ -520,7 +482,7 @@ function cforms_submitcomment($content) {
 	                        $mail->subj = $s[0];
 	                        if ( $mail->html_show_ac ) {
 	                            $mail->is_html(true);
-	                            $mail->body     =  $cformsSettings['global']['cforms_style_doctype'] .$mail->eol."<html xmlns=\"http://www.w3.org/1999/xhtml\">".$mail->eol."<head><title></title></head>".$mail->eol."<body {$cformsSettings['global']['cforms_style']['body']}>".$cmsghtml."</body></html>".$mail->eol;
+	                            $mail->body     =  "<html>".$mail->eol."<body>".$cmsghtml."</body></html>".$mail->eol;
 	                            $mail->body_alt  =  $cmsg;
 	                        }
 	                        else
@@ -658,74 +620,56 @@ if (!isset($SAJAX_INCLUDED)) {
 
 		$target = "";
 
-		### 10.02. Added header
-		header ('Content-Type: text/javascript');
-		header ('X-Content-Type-Options: nosniff');
-
 		if ($mode == "get") {
-			###  Bust cache in the head		
-			header ("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); 		###  Date in the past
+			###  Bust cache in the head
+			header ("Expires: Mon, 26 Jul 1997 05:00:00 GMT");    ###  Date in the past
 			header ("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
 			###  always modified
-			header ("Cache-Control: no-cache, must-revalidate");	###  HTTP/1.1
-			header ("Pragma: no-cache");                        	###  HTTP/1.0
-			$func_name = ( $_GET["rs"] );  							### 10.2.2012 sajax_sanitize removed
+			header ("Cache-Control: no-cache, must-revalidate");  ###  HTTP/1.1
+			header ("Pragma: no-cache");                          ###  HTTP/1.0
+			$func_name = sajax_sanitize( $_GET["rs"] );
 			if (! empty($_GET["rsargs"]))
-				$args = ( $_GET["rsargs"] ); 						### 10.2.2012 sajax_sanitize removed
+				$args = sajax_sanitize( $_GET["rsargs"] );
 			else
 				$args = array();
 		}
 		else {
-			$func_name = ( $_POST["rs"] ); 							### 10.2.2012 sajax_sanitize removed
+			$func_name = sajax_sanitize( $_POST["rs"] );
 			if (! empty($_POST["rsargs"]))
-				$args = ( $_POST["rsargs"] ); 						### 10.2.2012 sajax_sanitize removed
+				$args = sajax_sanitize( $_POST["rsargs"] );
 			else
 				$args = array();
 		}
 
-		### Kousuke Ebihara
 		if (! in_array($func_name, $sajax_export_list))
-			echo "-:".sajax_esc($func_name)." not callable";
+			echo "-:$func_name not callable";
 		else {
 			$result = call_user_func_array($func_name, $args);
 			echo "+:";
-			echo "var res = " . (trim(sajax_get_js_repr($result))) . "; res;"; // adjusted: removed sajax_esc
-		}		
+			echo "var res = " . trim(sajax_get_js_repr($result)) . "; res;";
+		}
 		exit;
 	}
-	
-	### Kousuke Ebihara
-	function unicode_escape($matches)
-    {
-        $u16 = mb_convert_encoding($matches[0], 'UTF-16');
-        return preg_replace('/[0-9a-f]{4}/', '\u$0', bin2hex($u16));
-    }
 
-    function escape_js_string($s)
-    {
-        return preg_replace_callback('/[^-\.0-9a-zA-Z]+/', 'unicode_escape', $s); 
-    }
+	### sanitize
+	function sajax_sanitize($t) {
+		//$t = preg_replace('/\s/', '', $t);
+		$t = str_replace('<php', '', $t);
+		$t = str_replace('<?', '', $t);
+		$t = str_replace('<script', '', $t);
+		return $t;
+	}
 
-	### fallback escaping without mb_ support
-    function escape_js_string_noMB($s)
-    {
-		$s = str_replace("\\", "\\\\", $s);
-		$s = str_replace("\r", "\\r", $s);
-		$s = str_replace("\n", "\\n", $s);
-		$s = str_replace("'", "\\'", $s);
-		return str_replace('"', '\\"', $s);
-    }
-	
 	###  javascript escape a value
-    function sajax_esc($val)
-    {
-		if( function_exists(mb_convert_encoding) )
-			return escape_js_string($val);
-		else
-			return escape_js_string_noMB($val);
-    }
-	
-	
+	function sajax_esc($val)
+	{
+		$val = str_replace("\\", "\\\\", $val);
+		$val = str_replace("\r", "\\r", $val);
+		$val = str_replace("\n", "\\n", $val);
+		$val = str_replace("'", "\\'", $val);
+		return str_replace('"', '\\"', $val);
+	}
+
 	function sajax_get_one_stub($func_name) {
 		ob_start();
 		$html = ob_get_contents();

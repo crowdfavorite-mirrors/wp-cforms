@@ -61,30 +61,28 @@
 					$emailtobox=true;
 				}
 
-				if(isset($_REQUEST['field_' . $i . '_required']) && ((strpos($type, 'tml5')!==false) || in_array($type,array('pwfield','textfield','datepicker','textarea','checkbox','multiselectbox','selectbox','emailtobox','upload','yourname','youremail','friendsname','friendsemail','email','cauthor','url','comment','radiobuttons'))) ) {
+				if(isset($_REQUEST['field_' . $i . '_required']) && in_array($type,array('pwfield','textfield','datepicker','textarea','checkbox','multiselectbox','selectbox','emailtobox','upload','yourname','youremail','friendsname','friendsemail','email','cauthor','url','comment','radiobuttons')) ) {
 					$required = 1;
 				}
 
-				if(isset($_REQUEST['field_' . $i . '_emailcheck']) && in_array($type,array('html5email','textfield','datepicker','youremail','friendsemail','email')) ){
+				if(isset($_REQUEST['field_' . $i . '_emailcheck']) && in_array($type,array('textfield','datepicker','youremail','friendsemail','email')) ){
 					$emailcheck = 1;
 				}
 
-				if(isset($_REQUEST['field_' . $i . '_clear']) && ((strpos($type, 'tml5')!==false) || in_array($type,array('pwfield','textfield','datepicker','textarea','yourname','youremail','friendsname','friendsemail','email','cauthor','url','comment'))) ) {
+				if(isset($_REQUEST['field_' . $i . '_clear']) && in_array($type,array('pwfield','textfield','datepicker','textarea','yourname','youremail','friendsname','friendsemail','email','cauthor','url','comment')) ) {
 					$clear = 1;
 				}
 
-				if(isset($_REQUEST['field_' . $i . '_disabled']) && ((strpos($type, 'tml5')!==false) || in_array($type,array('pwfield','textarea','datepicker','textfield','checkbox','checkboxgroup','multiselectbox','selectbox','radiobuttons','upload'))) ) {
+				if(isset($_REQUEST['field_' . $i . '_disabled']) && in_array($type,array('pwfield','textarea','datepicker','textfield','checkbox','checkboxgroup','multiselectbox','selectbox','radiobuttons','upload')) ) {
 					$disabled = 1;
 				}
 
-				if(isset($_REQUEST['field_' . $i . '_readonly']) && ((strpos($type, 'tml5')!==false) || in_array($type,array('pwfield','textarea','datepicker','textfield','checkbox','checkboxgroup','multiselectbox','selectbox','radiobuttons','upload'))) ) {
+				if(isset($_REQUEST['field_' . $i . '_readonly']) && in_array($type,array('pwfield','textarea','datepicker','textfield','checkbox','checkboxgroup','multiselectbox','selectbox','radiobuttons','upload')) ) {
 					$readonly = 1;
 				}
 
 				$all_fields[$i-1] = $name . '$#$' . $type . '$#$' . $required. '$#$' . $emailcheck . '$#$'. $clear . '$#$' . $disabled . '$#$' . $readonly;
 
-				### db('save field: '.$all_fields[$i-1]);
-				
 				if ($allgood)
 						$cformsSettings['form'.$no]['cforms'.$no.'_count_field_' . $i] = $all_fields[$i-1];
 
@@ -98,10 +96,10 @@
 
 	$cformsSettings['form'.$no]['cforms'.$no.'_noid'] =           $_REQUEST['cforms_upload_noid']?'1':'0';
 	if( $uploadfield && $_REQUEST['cforms_upload_dir']<>'' )
-		$cformsSettings['form'.$no]['cforms'.$no.'_upload_dir'] =     magic($_REQUEST['cforms_upload_dir'].'$#$'.$_REQUEST['cforms_upload_dir_url']);
-	$cformsSettings['form'.$no]['cforms'.$no.'_upload_ext'] =     magic($_REQUEST['cforms_upload_ext']);
-	$cformsSettings['form'.$no]['cforms'.$no.'_upload_size'] =    $_REQUEST['cforms_upload_size'];
-	$cformsSettings['form'.$no]['cforms'.$no.'_noattachments'] =  $_REQUEST['cforms_noattachments']?'1':'0';
+    $cformsSettings['form'.$no]['cforms'.$no.'_upload_dir'] =     magic($_REQUEST['cforms_upload_dir'].'$#$'.$_REQUEST['cforms_upload_dir_url']);
+  $cformsSettings['form'.$no]['cforms'.$no.'_upload_ext'] =     magic($_REQUEST['cforms_upload_ext']);
+  $cformsSettings['form'.$no]['cforms'.$no.'_upload_size'] =    $_REQUEST['cforms_upload_size'];
+  $cformsSettings['form'.$no]['cforms'.$no.'_noattachments'] =  $_REQUEST['cforms_noattachments']?'1':'0';
 
 
 	$cformsSettings['form'.$no]['cforms'.$no.'_submit_text'] =   magic($_REQUEST['cforms_submit_text']);
@@ -148,7 +146,6 @@
 
 
 	$cformsSettings['form'.$no]['cforms'.$no.'_emailoff'] =		 $_REQUEST['cforms_emailoff']?'1':'0';
-	$cformsSettings['form'.$no]['cforms'.$no.'_emptyoff'] =		 $_REQUEST['cforms_emptyoff']?'1':'0';
 	$cformsSettings['form'.$no]['cforms'.$no.'_fromemail'] =     magic($_REQUEST['cforms_fromemail']);
 	$cformsSettings['form'.$no]['cforms'.$no.'_email'] =         magic($_REQUEST['cforms_email']);
 	$cformsSettings['form'.$no]['cforms'.$no.'_bcc'] =           magic($_REQUEST['cforms_bcc']);
@@ -193,7 +190,7 @@
 	$cformsSettings['form'.$no]['cforms'.$no.'_mp']['mp_backtext'] =	magic($_REQUEST['cforms_mp_backtext']);
 	if( $_REQUEST['cforms_mp_form'] ){
 		$cformsSettings['form'.$no]['cforms'.$no.'_ajax']       = '0';
-		$cformsSettings['form'.$no]['cforms'.$no.'_dontclear']  = false; // NOTE that it can't be set with MP!
+    $cformsSettings['form'.$no]['cforms'.$no.'_dontclear']  = false;
 	} else
 		$cformsSettings['form'.$no]['cforms'.$no.'_ajax'] = 			$_REQUEST['cforms_ajax']?'1':'0';
 

@@ -2,7 +2,7 @@
  =====================================================================================
  License:
  =====================================================================================
- Copyright 2007-2011 OLIVER SEIDEL  (email : oliver.seidel @ deliciousdays.com)
+ Copyright 2007, 2008, 2009 OLIVER SEIDEL  (email : oliver.seidel @ deliciousdays.com)
 
   This program is free software: you can redistribute it and/or modify it under the
   terms of the GNU General Public License as published by the Free Software Foundation,
@@ -15,6 +15,7 @@
   You should have received a copy of the GNU General Public License along with this
   program. If not, see <http://www.gnu.org/licenses/>.
 
+
  =====================================================================================
  Donation Page:
  =====================================================================================
@@ -24,136 +25,6 @@
  =====================================================================================
  Version History:
  =====================================================================================
-
- 
-	!!! IMPORTANT !!!
-
-	v14.5+ is only compatible with WP3.3+
-
-	!!! IMPORTANT !!!
-
-	
-WHAT's NEW in cformsII - v14.6
-*) added:   NEW: my_cforms_filter()  in my-functions.php  (input filter)
-*) fixed:   Security/SPAM issue with TellAFriend feature
-*) added:   Avoiding wpautop screwing with the layout
-*) added:   Changed the_content filter priority to deal with themes demanding wpautop
-*) fixed:   multi-part forms: RESET button resets complete input and not just session
-
-
-WHAT's NEW in cformsII - v14.5
-*) added:   WP3.4 compliance
-*) fixed:   CAPTCHA security issue; can't override captcha settings via URL params
-*) fixed:   re-enabled version update info on the native WP plugins page
-
-WHAT's NEW in cformsII - v14.2
-*) added:   added more IQ to my-functions.php:
-            "adminEmailSUBJ" & "autoConfSUBJ" to change the subject line during run-time
-            Also, check out Regis' code example in this new section!
-            Thanks Regis!
-*) added:   "\n" in the default text of textarea fields is recognised as a new line character
-*) fixed:   Call-time pass-by-reference in lib_aux.php
-*) fixed:   XML download, imports now nicely into excel, even with multi-line fields
-*) fixed:   corrected superfluous html5***** settings for non html5 fields
-*) fixed:   bigger field label issues when using custom IDs and regexp
-*) fixed:   localization issue with lib_editor.php and added French translation for the editor. Thanks Regis!
-	
-WHAT's NEW in cformsII - v14.1
-*) fixed:    localization in wizard popups
-*) fixed:    array declaration error some experienced in lib_activate.php
-*) fixed:    header inclusion/exclusion on specific pages
-
-
-WHAT's NEW in cformsII - v14
-*) enhanced: tabbed navigation between form configuration fields
-*) added:    date picker support for year selection drop down
-*) added:    HTML5 support, new Global Settings (must be enabled first) and Form Options:
-             html5color, html5date, html5datetime, html5datetime-local, html5email, html5month, 
-			 html5number, html5range, html5search, html5tel, html5time, html5url, html5week
-*) added:    new my_cforms_logic() routines "fileDestination", "fileDestinationTrackingPage" for uploads
-*) fixed:    date picker start day
-*) fixed:    loading of calendar style (css)
-*) fixed:    form submission restrictions (from/to date and number)
-*) fixed:    extra slash removed from plugin URL (fixes path to custom CSS file in /cforms-custom/)
-
-WHAT's NEW in cformsII - v13.2.2
-*) fixed:    CC field issues for MP forms
-*) fixed:    Reply-To fixed in admin email
-*) fixed:    fixed 'custom names' form feature
-*) added:    hidden field default value supports cforms {default variables},eg. UserID, Name etc.
-
-WHAT's NEW in cformsII - v13.2.1
-*) fixed:    undefined function 'my_cforms_logic' 
-
-WHAT's NEW in cformsII - v13.2
-*) fixed:    XSS security issue with lib_ajax.php
-*) fixed:    several fixes around "CC: me" field
-*) improved: added Help Note on how to use {Custom Variables} in multi-page forms
-*) fixed:    default checkbox state is not restored on form reload (user choice remains)
-*) fixed:    removed depreciated eregi() & split() calls
-*) improved: better support for SSL and multi-site deployments (WP v3x!)
-*) fixed:    "Corrupted Content Error" on FF when backing up settings
-*) feature:	 empty fields can now be excluded from the admin email 
-            (Admin Email Message Options)
-*) fixed:    multi-page forms: the "disable email attachments" setting for individual  
-             forms is now being considered in the final admin email 
-*) improved: fixed several issues with multi page forms (accidental auto resets etc.),
-             forms now need to be manually reset via form reset button (setting),
-             no auto form reset anymore when on first form!
-             form session is properly remembered.       			 
-*) improved: calendar.css adjustments to make styles specific to cforms
-
-
-
-WHAT's NEW in cformsII - v13.1
-*) bugfix:	radio button fix
- 
-WHAT's NEW in cformsII - v13.0
-*) WP3.3 compliance
-*) other:    a new more modern default theme/style (cforms2012.css)
-*) other:    WP 3.3 jQuery / jQueryUI is now being used for the date picker!
-*) other:    link to supported date formats added to global settings screen
-*) other:    enhanced dashboard layout / listings
-*) other:    enhanced in-field editing on tracking page ("view records area")
-*) bugfix:   checkbox "default state" setting fixed
-*) bugfix:   checkboxgroup "default states" & "new line" settings fixed 
-*) bugfixes: several admin screens related fixes
-*) bugfixes: tracking page, download options fixed (header, URLs etc.)
-*) other:    checkbox fields now include a "checked symbol", instead of the word "on"
-*) other:    email layout enhancements (optimized for gmail & HTML capable clients)
-             !!! NOTE: in order to fully enable the new layout for old forms, you MUST 
-             reset the Admin & Auto Confirmation Messages (see button above each)
-
-WHAT's NEW in cformsII - v12.2
-*) other: pare_str() caused issues for some, commented out now
-
-WHAT's NEW in cformsII - v12.2
-*) bugfix: minor datepicker adjustment (for anyone that uses non standard date display)
-
-WHAT's NEW in cformsII - v12.0
-*) other:  WP3.2.1 compliance
-*) other:  upgraded to jQuery 1.6.2 (datepicker)
-*) bugfix: corrected WP comment form issue ($usermessage_text)
-*) bugfix: Zip Code RegExp in the Help Seection corrected
-*) bugfix: date picker fix for WP3.2
-
-WHAT's NEW in cformsII - v11.9
-*) bugfix: IE9 date picker fix
- 
-WHAT's NEW in cformsII - v11.8
-*) bugfix: fixing PHP's issue with uksort()
-*) bugfix: upload fields in forms could cause hang ups when submitted from iphone/ipad
-*) other:  enhanced path determination in cforms.js, should help to avoid issues going forward
-*) other:  session check in cforms.php to better support existing sessions (shopping carts etc)
- 
-WHAT's NEW in cformsII - v11.7.3
-*) bugfix: stalling of upload forms fixed (or ones with alternative form action)
-
-WHAT's NEW in cformsII - v11.7.2
-*) other:  enhanced support for form field arrays, e.g. :  my-field[id:address[]]
-*) bugfix: fixed jQuery wizard editor error 
-*) bugfix: fixed "upload field" handling & form error (stalling)
-*) bugfix: sorting fixed for API call "get_cforms_entries()" - hopefully for good
 
 WHAT's NEW in cformsII - v11.7.1
 *) bugfix: fixed function_exists() call in lib_functions.php

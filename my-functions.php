@@ -3,9 +3,6 @@
 ### Find below examples for your custom routines. Do not change the function names.
 ###
 
-
-### NEW: my_cforms_filter()   : in case you'd like to manipulate / check user input before further processing
-###
 ### my_cforms_logic() : gets triggered throughout cforms, supporting real-time configuration
 ###
 ### my_cforms_action() : gets triggered just before sending the admin email
@@ -15,27 +12,26 @@
 ### my_cforms_ajax_filter() : after validation, before processing/saving input data (AJAX)
 ###
 
+
 ### TO USE THE FUNCTIOS:
 ###   >>>   uncomment the functions as required
 ###   >>>   and provide your custom code where appropriate
 
+
+
 ###
 ### Your custom application logic features
 ###
-### "successMessage" 				$cformsdata = cforms datablock
-### "redirection"  					$cformsdata = cforms datablock
-### "filename"     					$cformsdata = $_REQUEST
-### "fileDestination" 				$cformsdata = $oldvalue = array!
-### "fileDestinationTrackingPage" 	$cformsdata = all SQL data, $oldvalue = array!
-### "adminTO"  	  					$cformsdata = cforms datablock
-### "nextForm"    					$cformsdata = cforms datablock
+### "successMessage" 	$cformsdata = cforms datablock
+### "redirection"  		$cformsdata = cforms datablock
+### "filename"     		$cformsdata = $_REQUEST
+### "adminTO"  	  		$cformsdata = cforms datablock
+### "nextForm"    		$cformsdata = cforms datablock
 ###
-### "adminEmailTXT"					$cformsdata = cforms datablock
-### "adminEmailHTML"				$cformsdata = cforms datablock
-### "autoConfTXT"					$cformsdata = cforms datablock
-### "autoConfHTML" 					$cformsdata = cforms datablock
-### "adminEmailSUBJ"				$cformsdata = cforms datablock
-### "autoConfSUBJ"					$cformsdata = cforms datablock
+### "adminEmailTXT"		$cformsdata = cforms datablock
+### "adminEmailHTML"	$cformsdata = cforms datablock
+### "autoConfTXT"		$cformsdata = cforms datablock
+### "autoConfHTML" 		$cformsdata = cforms datablock
 ###
 
 /*  <--- move or remove this line to uncomment functions below (and check the end as well!)
@@ -43,26 +39,11 @@
 function my_cforms_logic($cformsdata,$oldvalue,$setting) {
 
 
+
 	### If you're unsure how to reference $cformsdata use the below @mail call to send you the data array
 	### @mail('your@email.com', 'cforms my_action test', print_r($cformsdata,1), 'From: your@email.com');
 
 
-
-	###
-	### example: the below code modifies the REPLY-TO address (submitter)
-
-    if ( $setting == "ReplyTo" && $oldvalue<>'' ){
-
-        ### only form #2 should be affected (note: form #1 would be '' empty!!):
-		if ( $cformsdata['id']=='2' && $cformsdata['data']['Your Name']<>'' ){
-
-			return '"'.$cformsdata['data']['Your Name'].'"' . ' <'.$oldvalue.'>';  ### This requires the form to have field labeled "Your Name" !
-
-		}
-
-    }
-	
-	
 
 	###
 	### example: the below code changes the original Success Message
@@ -83,8 +64,7 @@ function my_cforms_logic($cformsdata,$oldvalue,$setting) {
 	### example: the below code changes a user-variable in both the Text & HTML part of
     ###          the admin email & auto confirmation email
 
-    if ( $setting == "adminEmailTXT" || $setting == "adminEmailHTML" || $setting == "autoConfTXT" || $setting == "autoConfHTML" ||
-		 $setting == "adminEmailDataTXT" || $setting == "adminEmailDataHTML"){
+    if ( $setting == "adminEmailTXT" || $setting == "adminEmailHTML" || $setting == "autoConfTXT" || $setting == "autoConfHTML" ){
 
         ### it's only changed though for form #2
         ### and requires "{CustomSalutation}" to be in the message(s)
@@ -100,28 +80,7 @@ function my_cforms_logic($cformsdata,$oldvalue,$setting) {
 
     }
 
-	
-	
-	### example: the below code replaces the custom var {DateFuture=Nd} in the subject
-	###			 field of the admin email & auto confirmation email
-	### Code Contribution by Regis Villemin
-	
-    if ( $setting == "autoConfSUBJ" || $setting == "autoConfSUBJ" ){
-		$m 	= preg_replace_callback( '/{DateFuture=([0-9]+)d}/i',
-						create_function(
-							'$days',
-							'
 
-							$datefuture = strtotime ("+$days[1] days");
-							
-							return strtoupper( strftime( "%A %d %B %Y",  $datefuture ) );
-							'
-						),
-						$oldvalue ); 
-	
-		return $m;
-    }
-	
 
 	### example: changes the next form to be form ID 5 (which is multi form page enabled)
 
@@ -154,39 +113,6 @@ function my_cforms_logic($cformsdata,$oldvalue,$setting) {
 	}
 
 
-	
-	### example: allows the final destination file path & name to be modified, return result = a full, absolute path
-	### NOTE: changing the path or filename may cause the file links on the tracking page to not function anymore!
-	
-    if ( $setting == "fileDestination" ){
-	
-		$submissionID = $oldvalue['subID'];					### submission ID
-
-		$newArray = array();
-		$newArray['name'] = $submissionID . '-' . $oldvalue['name'];	### filename only
-		$newArray['path'] = rtrim($oldvalue['path'], '/');				### path (may or may not have trailing slash!)
-		
-		$newArray['modified'] = true;		### must set
-		return $newArray;					### TRIPPLE check that this array always! returns valid path + name info
-	}
-	
-	
-	### this allows to modify the file path shown on the tracking page and for downloads
-	###	you may only needs the below in case the final upload dir deviates from the form's configured one
-	
-    if ( $setting == "fileDestinationTrackingPage" ){
-	
-		$submissionID = $oldvalue['subID'];					### submission ID
-
-		$newArray = array();
-		$newArray['name'] = $submissionID . '-' . $oldvalue['name'];	### filename only
-		$newArray['path'] = rtrim($oldvalue['path'], '/');				### path (may or may not have trailing slash!)
-
-		$newArray['modified'] = true;		### must set
-		return $newArray;					### TRIPPLE check that this array always! returns valid path + name info
-	}
-	
-	
 
 	### example: changes redirection address based on user input field
 
@@ -206,7 +132,7 @@ function my_cforms_logic($cformsdata,$oldvalue,$setting) {
 
 
 
-	return $oldvalue; // If you use this function, this MUST be the last statement!
+	return $oldvalue;
 }
 
 
@@ -220,42 +146,6 @@ function my_cforms_logic($cformsdata,$oldvalue,$setting) {
 ###
 ###
 ### Your custom user data input filter
-###
-###
-
-/*  <--- move or remove this line to uncomment functions below (and check the end as well!)
-
-function my_cforms_filter($formID) {
-
-	global $track;
-
-	### 		$track stores all user input
-	### Note: 	$formID = '' (empty) for the first form!
-
-	### triggers on your third form
-	if ( $formID == '3' ) {
-
-		### Do something with the data or not, up to you
-		$track['Your Name'] = 'Mr./Mrs. '.$track['Your Name'];
-
-	}
-
-	### Send to 3d party or do something else
-	@mail('your@email.com', 'cforms my_filter test', print_r($track,1), 'From: your@blog.com');
-
-}
-
- ending comment line for: my_cforms_filter -------------------->  */
-
-
-
-
-
-
-
-###
-###
-### Your custom user data action routine
 ###
 ###
 

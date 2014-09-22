@@ -19,11 +19,10 @@ global $wpdb;
 $wpdb->cformssubmissions	= $wpdb->prefix . 'cformssubmissions';
 $wpdb->cformsdata       	= $wpdb->prefix . 'cformsdata';
 
-$f_id   = $_POST['element_id'];
-$oldVal = addslashes($_POST['original_html']);
-$newVal = addslashes($_POST['update_value']);
+$f_id   = $_POST['id'];
+$newVal = addslashes($_POST['value']);
 
-if ( $f_id<>'' && $newVal<>$oldVal  ) {
+if ( $f_id<>'' ) {
 
 	$sql="UPDATE {$wpdb->cformsdata} SET field_val='$newVal' WHERE f_id = '$f_id'";
 	$entries = $wpdb->get_results($sql);
